@@ -36,5 +36,5 @@ private:
 	//アクター一覧
 	std::map<ActorGroup,ActorPtr> actors_;
 
-	ActorPtr root_;
+	ActorPtr root_{ nullptr };
 };

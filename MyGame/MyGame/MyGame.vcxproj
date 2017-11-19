@@ -200,6 +200,7 @@
     <ClInclude Include="src\Actor\Actor.h" />
     <ClInclude Include="src\Actor\ActorManager.h" />
     <ClInclude Include="src\Actor\ActorPtr.h" />
+    <ClInclude Include="src\Actor\Actors.h" />
     <ClInclude Include="src\Actor\Body\Base\Body.h" />
     <ClInclude Include="src\Actor\Body\Base\DummyBody.h" />
     <ClInclude Include="src\Actor\Body\Base\HitInfo.h" />

@@ -18,6 +18,8 @@ public:
 	void handleMessage(EventMessage message, void* param);
 	// アクターの追加
 	virtual void addActor(ActorGroup group, const ActorPtr& actor)override;
+
+	void addCamera(const std::shared_ptr<CameraActor> & cameraActor);
 	// アクターの検索
 	virtual ActorPtr findActor(const std::string& name)override;
 	// アクターの複数検索
@@ -28,10 +30,13 @@ public:
 	virtual FieldPtr getField()override;
 	//フィールドの設定
 	virtual void setField(FieldPtr field)override;
+
+	virtual std::weak_ptr<CameraActor> getCamera()const override;
 private:
 	FieldPtr field_;
 	ActorManager actors_;
 	UIManager uiManager_;
 
+	std::weak_ptr<CameraActor> camera_;
 
 };

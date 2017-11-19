@@ -15,23 +15,35 @@ Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 
 void Player::initialize()
 {
+	state_ = Player_State::Idle;
+
+
 }
 
 void Player::update(float deltaTime)
 {
+	playerUpdateFunc_[state_](deltaTime);
+
 	animation_.Update(deltaTime);
+
+	position_ += velocity_;
+	velocity_ *= 0.8f;
 }
 
 void Player::draw() const
 {
-	animation_.Draw(Matrix(rotation_).Translation(position_));
-	body_->draw();
+	//描画位置を合わせる(最後のVector3はモデル自身のズレ)
+	Vector3 drawPosition = position_ + Vector3::Down*body_->length()*0.5f - Vector3(0.0f, 2.f, 0.0f);
+	//前後を合わせる
+	animation_.Draw(Matrix(rotation_)*Matrix::CreateFromAxisAngle(rotation_.Up(), 180.0f).Translation(drawPosition));
+	body_->transform(getPose())->draw();
 }
 
 bool Player::change_State_and_Anim(Player_State state, Player_Animation animID, float animFrame, float animSpeed, bool isLoop)
 {
+	//同じ状態には遷移しない
 	if (state_ == state)return false;
-	
+	//先にアニメーションを切り替え
 	change_Animation(animID, animFrame, animSpeed, isLoop);
 
 	if (!change_State(state))return false;
@@ -64,9 +76,10 @@ void Player::to_Idle()
 
 void Player::update_Idle(float deltaTime)
 {
-	if (InputChecker::GetInstance().Stick().Length() >= 0.2f) {
-		
-	}
+	Vector2 velocity = InputChecker::GetInstance().Stick();
+	if (velocity.Length() <= 0.2f)return;
+	velocity_ += Vector3(velocity.x, 0.0f, velocity.y);
+	
 }
 
 void Player::end_Idle()

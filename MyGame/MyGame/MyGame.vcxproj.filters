@@ -386,5 +386,8 @@
     <ClInclude Include="src\Actor\Other\CameraActor.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="src\Actor\Actors.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

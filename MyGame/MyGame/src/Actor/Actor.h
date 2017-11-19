@@ -42,8 +42,12 @@ public:
 	int getNumber()const;
 	//名前の取得
 	std::string getName()const;
+	//判定の取得
 	IBodyPtr getBody()const;
+	//位置の取得
 	Vector3 getPosition()const;
+	// 変換行列の取得
+	Matrix Actor::getPose() const;
 
 	//死んでるか
 	bool isDead()const;
@@ -79,6 +83,8 @@ protected:
 	std::string	name_;
 	// 座標
 	Vector3	position_{ Vector3::Zero };
+	//1フレーム毎の移動量
+	Vector3 velocity_{ Vector3::Zero };
 	//前フレームの座標
 	Vector3 prevPosition_{ Vector3::Zero };
 	Matrix prevRotation_{ Matrix::Identity };

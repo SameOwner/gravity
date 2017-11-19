@@ -3,12 +3,12 @@
 #include"../Field/FieldBase.h"
 #include"Body/Base/HitInfo.h"
 
-Actor::Actor():world_(nullptr),name_("Null"),position_(Vector3::Zero),body_(std::make_shared<DummyBody>())
+Actor::Actor():world_(nullptr),name_("Null"),position_(Vector3::Zero),body_(std::make_shared<DummyBody>()),children_()
 {
 }
 
 Actor::Actor(IWorld * world, const std::string & name, const Vector3 & position, const IBodyPtr & body):
-	world_(world),name_(name),position_(position),body_(body)
+	world_(world),name_(name),position_(position),body_(body), children_()
 {
 }
 
@@ -53,8 +53,7 @@ void Actor::end()
 
 bool Actor::isCollide(const Actor & other)
 {
-	HitInfo info;
-	return body_->isCollide(*other.getBody().get(),info);
+	return body_->transform(getPose())->isCollide(*other.getBody()->transform(other.getPose()).get(), HitInfo());
 }
 
 void Actor::onCollide(Actor & other)
@@ -114,6 +113,10 @@ IBodyPtr Actor::getBody() const
 Vector3 Actor::getPosition() const
 {
 	return position_;
+}
+
+Matrix Actor::getPose() const {
+	return Matrix(rotation_).Translation(position_);
 }
 
 bool Actor::isDead() const

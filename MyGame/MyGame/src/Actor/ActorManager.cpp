@@ -12,9 +12,13 @@ void ActorManager::initialize()
 	countList_ = 0;//¯•Ê”Ô†ƒŠƒXƒg‚ğ‰Šú‰»
 	actors_.clear();
 
+	root_ = std::make_shared<Actor>();
+
 	actors_[ActorGroup::PLAYER_ACTOR] = std::make_shared<Actor>();
+	actors_[ActorGroup::ETCETERA_ACTOR] = std::make_shared<Actor>();
 	root_->clearChildren();
 	root_->addChild(actors_[ActorGroup::PLAYER_ACTOR]);
+	root_->addChild(actors_[ActorGroup::ETCETERA_ACTOR]);
 
 }
 

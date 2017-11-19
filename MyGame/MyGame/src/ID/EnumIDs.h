@@ -2,7 +2,9 @@
 
 //モデルID
 enum class MODEL_ID {
-	MODEL_PLAYER
+	MODEL_PLAYER,
+	MODEL_SKYBOX,
+	MODEL_STAGE,
 };
 enum class SPRITE_ID {
 
@@ -39,5 +41,6 @@ enum class EventMessage {
 
 //Actorのグループ分け
 enum class ActorGroup {
-	PLAYER_ACTOR,
+	ETCETERA_ACTOR,//ゲームに関与しないアクター
+	PLAYER_ACTOR,//プレイヤー
 };

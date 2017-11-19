@@ -7,6 +7,7 @@
 
 enum class ActorGroup;
 enum class EventMessage;
+class CameraActor;
 // ワールド抽象インターフェース
 class IWorld {
 public:
@@ -23,5 +24,6 @@ public:
 	// フィールドの取得
 	virtual FieldPtr getField() = 0;
 	virtual void setField(FieldPtr field) = 0;
+	virtual std::weak_ptr<CameraActor> getCamera()const = 0;
 
 };

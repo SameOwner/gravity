@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DxLib.h>
+
 #include "Time.h"
 #include "../Input/InputChecker.h"
 #include "../Math/Math.h"
@@ -69,7 +70,7 @@ private:
 	}
 	//フレーム終了時処理
 	void frameEnd() {
-
+		sceneManager_.checkIsEnd();
 	}
 	// 終了
 	void end() {

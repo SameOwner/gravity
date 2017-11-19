@@ -31,6 +31,8 @@ public:
 	void setLoop(bool isLoop) { isLoop_ = isLoop; }
 	//アニメーションの再生速度を設定する
 	void setAnimSpeed(float animSpeed) { animSpeed_ = animSpeed; }
+	//アニメーションを強制的にブレンドする
+	void blendAnim(int anim1, int anim2, float blendRate);
 private:
 	// コピーコンストラクタ
 	AnimationDx(const AnimationDx& other) = delete;

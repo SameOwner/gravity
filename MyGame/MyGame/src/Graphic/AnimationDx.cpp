@@ -106,5 +106,13 @@ float AnimationDx::GetAnimMaxTime(int index) const
 	return MV1GetAnimTotalTime(modelHandle_, index) / 60.0f;
 }
 
+void AnimationDx::blendAnim(int anim1, int anim2, float blendRate)
+{
+	prevAnim_ = anim2;
+	anim_ = anim1;
+	rate_ = blendRate;
+
+}
+
 
 

@@ -2,8 +2,8 @@
 #include"Scene.h"
 
 #include"../World/World.h"
-#include"../Actor/Player/Player.h"
 
+class Player;
 //シーンテンプレート
 class GamePlayScene:public Scene {
 public:
