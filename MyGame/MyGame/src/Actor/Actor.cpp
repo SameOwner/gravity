@@ -85,6 +85,16 @@ bool Actor::field(Vector3& result) {
 	return false;
 }
 
+bool Actor::floor(Vector3 & result)
+{
+	Vector3 hitpos;
+	if (world_->getField()->getMesh().collide_line(position_, position_ + body_->points(1)+Vector3::Down*body_->radius(), (VECTOR*)&hitpos)) {
+		result = hitpos;
+		return true;
+	}
+	return false;
+}
+
 void Actor::addChild(ActorPtr child)
 {
 	children_.push_back(child);

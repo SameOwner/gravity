@@ -16,13 +16,21 @@ Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 	playerToNextModeFunc_[Player_State::Float] = [this]() {to_Float(); };
 	playerEndModeFunc_[Player_State::Float] = [this]() {end_Float(); };
 
+	playerUpdateFunc_[Player_State::Fly] = [this](float deltaTime) {update_Fly(deltaTime); };
+	playerToNextModeFunc_[Player_State::Fly] = [this]() {to_Fly(); };
+	playerEndModeFunc_[Player_State::Fly] = [this]() {end_Fly(); };
+
+	playerUpdateFunc_[Player_State::Fall] = [this](float deltaTime) {update_Fall(deltaTime); };
+	playerToNextModeFunc_[Player_State::Fall] = [this]() {to_Fall(); };
+	playerEndModeFunc_[Player_State::Fall] = [this]() {end_Fall(); };
+
 }
 
 void Player::initialize()
 {
 	state_ = Player_State::Idle;
-
-
+	gravity_ = 0.0f;
+	prevfloor_ = false;
 }
 
 void Player::update(float deltaTime)
@@ -33,6 +41,14 @@ void Player::update(float deltaTime)
 
 	position_ += velocity_;
 	velocity_ *= 0.8f;
+
+	Vector3 result;
+	if (field(result))position_ = result;
+	if (floor(result)) {
+		prevfloor_ = true;
+		position_ = result+body_->points(0)+Vector3::Up*body_->radius();
+	}
+	else prevfloor_ = false;
 }
 
 void Player::draw() const
@@ -82,8 +98,10 @@ void Player::to_Idle()
 void Player::update_Idle(float deltaTime)
 {
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float))playerUpdateFunc_[state_](deltaTime);
+		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		return;
 	}
+	if (prevfloor_)gravity_ = 0.0f;
 	Vector2 velocity = InputChecker::GetInstance().Stick();
 	if (velocity.Length() <= 0.2f)return;
 	Vector3 frameVelocty = world_->getCamera().lock()->getMoveForwardPos()*velocity.y;//‘O•ûŒü‚Ö‚ÌˆÚ“®—Ê
@@ -91,7 +109,7 @@ void Player::update_Idle(float deltaTime)
 	frameVelocty *= deltaTime;
 	velocity_ += Vector3(frameVelocty.x, 0.0f, frameVelocty.z);
 
-	rotation_ = rotation_.Forward(velocity_.Normalize()).NormalizeRotationMatrix();
+	rotation_ = rotation_.Forward(frameVelocty.Normalize()).NormalizeRotationMatrix();
 
 }
 
@@ -113,12 +131,66 @@ void Player::end_Move()
 
 void Player::to_Float()
 {
+	//velocity_ = Vector3::Zero;
+
+	velocity_ += rotation_.Up()*1.0f;
 }
 
 void Player::update_Float(float deltaTime)
 {
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
+		if (change_State_and_Anim(Player_State::Fly, Player_Animation::Fly));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
+		if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+
 }
 
 void Player::end_Float()
+{
+}
+
+void Player::to_Fly()
+{
+	flyDirection_ = world_->getCamera().lock()->getMoveForwardPos().Normalize();
+}
+
+void Player::update_Fly(float deltaTime)
+{
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
+		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
+		if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+
+	velocity_ += flyDirection_*1.0f;
+}
+
+void Player::end_Fly()
+{
+}
+
+void Player::to_Fall()
+{
+}
+
+void Player::update_Fall(float deltaTime)
+{
+	if (prevfloor_) {
+		if (change_State_and_Anim(Player_State::Idle, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+	gravity_ += 0.1f;
+
+	velocity_ += Vector3::Down*gravity_;
+}
+
+void Player::end_Fall()
 {
 }

@@ -33,7 +33,10 @@ public:
 
 	// 衝突処理
 	void collide(Actor& other);
+	//ステージとの共通当たり判定
 	bool field(Vector3& result);
+	//ステージ床面限定当たり判定
+	bool floor(Vector3& result);
 	//子供を追加する
 	void addChild(ActorPtr child);
 	//識別番号の設定

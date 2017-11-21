@@ -9,10 +9,14 @@ public:
 	enum class Player_State {
 		Idle,//待機
 		Float,//浮遊
+		Fly,//飛行
+		Fall,//落下
 	};
 	enum class Player_Animation {
 		Idle=0,
 		Float=0,
+		Fly=0,
+		Fall=0,
 
 	};
 public:
@@ -51,11 +55,26 @@ private:
 	void update_Float(float deltaTime);
 	void end_Float();
 
+	//飛行
+	void to_Fly();
+	void update_Fly(float deltaTime);
+	void end_Fly();
+
+	//落下
+	void to_Fall();
+	void update_Fall(float deltaTime);
+	void end_Fall();
 private:
 	AnimationDx animation_;
 	//自身の状態
 	Player_State state_;
-
+	//重力倍率
+	float gravity_{ 0.0f };
+	
+	//飛行方向
+	Vector3 flyDirection_{ Vector3::Zero };
+	//前フレ床についてたか
+	bool prevfloor_{ false };
 
 	std::map<Player_State, std::function<void(float)>> playerUpdateFunc_;
 	std::map<Player_State, std::function<void()>> playerEndModeFunc_;
