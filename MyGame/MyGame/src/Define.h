@@ -1,5 +1,5 @@
 #pragma once
-static const float FIELD_SCALE = 1.0f;
+static const float FIELD_SCALE = 10.0f;
 
 static const float BGMVOLUME = 1.0f;
 static const float SEVOLUME = 1.0f;

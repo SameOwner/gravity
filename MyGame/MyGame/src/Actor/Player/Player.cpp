@@ -1,6 +1,7 @@
 #include "Player.h"
 #include"../../Graphic/Model.h"
 #include"../../Input/InputChecker.h"
+#include"../Other/CameraActor.h"
 
 Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 	Actor(world,"Player",position,body)
@@ -11,6 +12,10 @@ Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 	playerToNextModeFunc_[Player_State::Idle]= [this]() {to_Idle(); };
 	playerEndModeFunc_[Player_State::Idle]= [this]() {end_Idle(); };
 	
+	playerUpdateFunc_[Player_State::Float] = [this](float deltaTime) {update_Float(deltaTime); };
+	playerToNextModeFunc_[Player_State::Float] = [this]() {to_Float(); };
+	playerEndModeFunc_[Player_State::Float] = [this]() {end_Float(); };
+
 }
 
 void Player::initialize()
@@ -76,10 +81,18 @@ void Player::to_Idle()
 
 void Player::update_Idle(float deltaTime)
 {
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
+		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float))playerUpdateFunc_[state_](deltaTime);
+	}
 	Vector2 velocity = InputChecker::GetInstance().Stick();
 	if (velocity.Length() <= 0.2f)return;
-	velocity_ += Vector3(velocity.x, 0.0f, velocity.y);
-	
+	Vector3 frameVelocty = world_->getCamera().lock()->getMoveForwardPos()*velocity.y;//‘O•ûŒü‚Ö‚ÌˆÚ“®—Ê
+	frameVelocty += world_->getCamera().lock()->getMoveRightPos()*velocity.x;
+	frameVelocty *= deltaTime;
+	velocity_ += Vector3(frameVelocty.x, 0.0f, frameVelocty.z);
+
+	rotation_ = rotation_.Forward(velocity_.Normalize()).NormalizeRotationMatrix();
+
 }
 
 void Player::end_Idle()
@@ -95,5 +108,17 @@ void Player::update_Move(float deltaTime)
 }
 
 void Player::end_Move()
+{
+}
+
+void Player::to_Float()
+{
+}
+
+void Player::update_Float(float deltaTime)
+{
+}
+
+void Player::end_Float()
 {
 }

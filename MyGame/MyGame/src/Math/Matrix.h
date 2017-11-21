@@ -64,7 +64,7 @@ struct Matrix {
 
 	// 前方ベクトルを取得
 	Vector3 Forward() const;
-	// 後方ベクトルを設定
+	// 前方ベクトルを設定
 	Matrix& Forward(const Vector3& forward);
 
 	// 後方ベクトルを取得

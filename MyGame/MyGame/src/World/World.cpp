@@ -45,7 +45,7 @@ void World::addActor(ActorGroup group, const ActorPtr & actor)
 void World::addCamera(const std::shared_ptr<CameraActor> & cameraActor)
 {
 	camera_ = cameraActor;
-	actors_.addActor(ActorGroup::ETCETERA_ACTOR, actor);
+	actors_.addActor(ActorGroup::ETCETERA_ACTOR, cameraActor);
 
 }
 

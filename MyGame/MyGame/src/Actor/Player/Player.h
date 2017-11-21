@@ -7,10 +7,13 @@
 class Player:public Actor {
 public:
 	enum class Player_State {
-		Idle,
+		Idle,//‘Ò‹@
+		Float,//•‚—V
 	};
 	enum class Player_Animation {
-		Idle,
+		Idle=0,
+		Float=0,
+
 	};
 public:
 	Player(IWorld* world, const Vector3& position, const IBodyPtr& body = std::make_shared<BoundingCapsule>(Vector3{0.0f,0.0f,0.0f},Matrix::Identity,15.0f,4.0f));
@@ -42,6 +45,11 @@ private:
 	void to_Move();
 	void update_Move(float deltaTime);
 	void end_Move();
+
+	//•‚—V
+	void to_Float();
+	void update_Float(float deltaTime);
+	void end_Float();
 
 private:
 	AnimationDx animation_;

@@ -11,6 +11,10 @@ public:
 	virtual void update(float deltaTime)override;
 	virtual void draw()const override;
 	virtual void end()override;
+	//前方向移動ベクトルを取得する
+	Vector3 getMoveForwardPos()const { return movefwPos_; }
+	//横方向移動ベクトルを取得する
+	Vector3 getMoveRightPos()const { return moverhPos_; }
 	//ターゲットの指定
 	void setTarget(const std::shared_ptr<Actor>& target);
 private:
@@ -20,8 +24,14 @@ private:
 	bool isActive_{ true };
 	//キャラクターとカメラの距離
 	float cameraDistance_{ 0.0f };
+	//カメラを基準とした前移動ベクトル
+	Vector3 movefwPos_{ Vector3::Zero };
+	//カメラを基準とした横移動ベクトル
+	Vector3 moverhPos_{ Vector3::Zero };
 	//カメラの回転
 	Vector2 rotate_{ Vector2::Zero };
 	//注目する位置を動かすベクトル
 	Vector3 moveTargetPos_{ Vector3::Zero };
+	//補正ベクトル
+	Vector3 correctPos_{ Vector3{0.0f,5.0f,0.0f} };
 };
