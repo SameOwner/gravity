@@ -49,6 +49,8 @@ public:
 	IBodyPtr getBody()const;
 	//ˆÊ’u‚Ìæ“¾
 	Vector3 getPosition()const;
+	//‰ñ“]s—ñ‚Ìæ“¾
+	Matrix getRotation()const;
 	// •ÏŠ·s—ñ‚Ìæ“¾
 	Matrix Actor::getPose() const;
 

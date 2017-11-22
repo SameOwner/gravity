@@ -13,6 +13,7 @@ SceneManager::~SceneManager() {
 	scenes_.clear();
 }
 
+
 void SceneManager::start() {
 	scenes_[currentScene_]->start();
 }

@@ -8,14 +8,20 @@ class Player:public Actor {
 public:
 	enum class Player_State {
 		Idle,//待機
+		Jump,//ジャンプ
+		Slide,//滑り
 		Float,//浮遊
 		Fly,//飛行
+		WallRun,//壁貼りつき
 		Fall,//落下
 	};
 	enum class Player_Animation {
 		Idle=0,
+		Jump=0,
+		Slide=0,
 		Float=0,
 		Fly=0,
+		WallRun=0,
 		Fall=0,
 
 	};
@@ -28,7 +34,8 @@ public:
 
 	void draw()const;
 
-
+	//空中時はx,zの移動ベクトルを大きくする
+	void aerialVelocityKeep();
 private:
 
 	//状態変更とアニメーション変更を同時に行う
@@ -37,6 +44,9 @@ private:
 	bool change_State(Player_State state);
 	//アニメーションの変更
 	void change_Animation(Player_Animation animID, float animFrame = 0.0f, float animeSpeed = 1.0f, bool isLoop = true);
+
+	//重力値の加算
+	void addGravity();
 
 //状態関数
 private:
@@ -50,6 +60,11 @@ private:
 	void update_Move(float deltaTime);
 	void end_Move();
 
+	//ジャンプ
+	void to_Jump();
+	void update_Jump(float deltaTime);
+	void end_Jump();
+
 	//浮遊
 	void to_Float();
 	void update_Float(float deltaTime);
@@ -60,10 +75,17 @@ private:
 	void update_Fly(float deltaTime);
 	void end_Fly();
 
+	//壁貼りつき
+	void to_WallRun();
+	void update_WallRun(float deltaTime);
+	void end_WallRun();
+
 	//落下
 	void to_Fall();
 	void update_Fall(float deltaTime);
 	void end_Fall();
+
+	
 private:
 	AnimationDx animation_;
 	//自身の状態

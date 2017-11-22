@@ -2,6 +2,7 @@
 #include"../Actor/Actors.h"
 #include"../Graphic/Model.h"
 #include"../Field/FieldBase.h"
+#include"../Input/InputChecker.h"
 
 GamePlayScene::GamePlayScene():world_(),player_(nullptr)
 {
@@ -24,6 +25,11 @@ void GamePlayScene::start()
 void GamePlayScene::update(float deltaTime)
 {
 	world_.update(deltaTime);
+
+	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::Start)) {
+		isEnd_ = true;
+		next_ = SceneType::SCENE_TITLE;
+	}
 }
 
 void GamePlayScene::draw() const

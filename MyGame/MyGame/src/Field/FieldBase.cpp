@@ -17,7 +17,7 @@ FieldBase::FieldBase(int field, int skybox) :
 	// スカイボックスの座標指定
 	MV1SetPosition(skyBox_, Vector3::Zero);
 	// スカイボックスの拡大率指定
-	MV1SetScale(skyBox_, Vector3::One*5.0f*FIELD_SCALE);
+	MV1SetScale(skyBox_, Vector3::One*0.5f*FIELD_SCALE);
 }
 
 // 更新
