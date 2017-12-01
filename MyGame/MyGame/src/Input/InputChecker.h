@@ -13,6 +13,8 @@ public:
 		Y,
 		R1,
 		L1,
+		R2,
+		L2,
 		Start,
 		Back,
 		Key_Count//—˜—p‚·‚éƒL[‚Ì”

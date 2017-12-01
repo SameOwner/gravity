@@ -61,6 +61,8 @@ struct Matrix {
 	static Matrix NormalizeRotationMatrix(const Matrix& matrix);
 	//回転行列を正規化します
 	Matrix& NormalizeRotationMatrix();
+	//UPベクトルを基準にして回転行列を正規化します
+	Matrix& NormalizeRotationMatrix_BaseUp();
 
 	// 前方ベクトルを取得
 	Vector3 Forward() const;

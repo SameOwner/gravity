@@ -246,6 +246,14 @@ Matrix & Matrix::NormalizeRotationMatrix(){
 	Vector3 f = Vector3::Cross(l, u);
 	return Left(l).Up(u).Forward(f);
 }
+Matrix & Matrix::NormalizeRotationMatrix_BaseUp()
+{
+	Vector3 l = Vector3::Normalize(Vector3::Cross(Up(), Forward()));
+	Vector3 f = Vector3::Normalize(Vector3::Cross(l, Up()));
+	Vector3 u = Vector3::Normalize(Vector3::Cross(f, l));
+	return Left(l).Up(u).Forward(f);
+}
+//ˆâ‚µ‚½‚¢ƒxƒNƒgƒ‹–ˆ‚É³‹K‰»ŠÖ”‚ğì‚é
 
 Vector3 Matrix::Forward() const
 {

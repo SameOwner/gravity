@@ -10,18 +10,24 @@ public:
 		Idle,//待機
 		Jump,//ジャンプ
 		Slide,//滑り
+		SlideJump,//滑りジャンプ
 		Float,//浮遊
 		Fly,//飛行
 		WallRun,//壁貼りつき
+		FloatJump,//壁貼りつきジャンプ
+		FloatFall,//壁貼りつき落下
 		Fall,//落下
 	};
 	enum class Player_Animation {
 		Idle=0,
 		Jump=0,
 		Slide=0,
+		SlideJump=0,
 		Float=0,
 		Fly=0,
 		WallRun=0,
+		FloatJump = 0,
+		FloatFall = 0,
 		Fall=0,
 
 	};
@@ -36,6 +42,7 @@ public:
 
 	//空中時はx,zの移動ベクトルを大きくする
 	void aerialVelocityKeep();
+	void floatVelocityKeep();
 private:
 
 	//状態変更とアニメーション変更を同時に行う
@@ -47,6 +54,9 @@ private:
 
 	//重力値の加算
 	void addGravity();
+
+	//重力値(重力変化時)の加算
+	void addFloatGravity();
 
 //状態関数
 private:
@@ -60,10 +70,19 @@ private:
 	void update_Move(float deltaTime);
 	void end_Move();
 
+	void to_Slide();
+	void update_Slide(float deltaTime);
+	void end_Slide();
+
 	//ジャンプ
 	void to_Jump();
 	void update_Jump(float deltaTime);
 	void end_Jump();
+
+	//浮遊ジャンプ
+	void to_SlideJump();
+	void update_SlideJump(float);
+	void end_SlideJump();
 
 	//浮遊
 	void to_Float();
@@ -79,6 +98,16 @@ private:
 	void to_WallRun();
 	void update_WallRun(float deltaTime);
 	void end_WallRun();
+
+	//壁ジャンプ
+	void to_FloatJump();
+	void update_FloatJump(float deltaTime);
+	void end_FloatJump();
+
+	//壁ジャンプ
+	void to_FloatFall();
+	void update_FloatFall(float deltaTime);
+	void end_FloatFall();
 
 	//落下
 	void to_Fall();
@@ -101,6 +130,4 @@ private:
 	std::map<Player_State, std::function<void(float)>> playerUpdateFunc_;
 	std::map<Player_State, std::function<void()>> playerEndModeFunc_;
 	std::map<Player_State, std::function<void()>> playerToNextModeFunc_;
-
-
 };

@@ -10,6 +10,8 @@ InputChecker::InputChecker()
 	inputList_[Input_Key::Y] = Connect_Key_Pad(KEYCODE::X, DualshockKey::Triangle);
 	inputList_[Input_Key::R1] = Connect_Key_Pad(KEYCODE::E, DualshockKey::R1);
 	inputList_[Input_Key::L1] = Connect_Key_Pad(KEYCODE::Q, DualshockKey::L1);
+	inputList_[Input_Key::R2] = Connect_Key_Pad(KEYCODE::R, DualshockKey::R2);
+	inputList_[Input_Key::L2] = Connect_Key_Pad(KEYCODE::TAB, DualshockKey::L2);
 	inputList_[Input_Key::Start] = Connect_Key_Pad(KEYCODE::H, DualshockKey::Option);
 	inputList_[Input_Key::Back] = Connect_Key_Pad(KEYCODE::B, DualshockKey::Share);
 

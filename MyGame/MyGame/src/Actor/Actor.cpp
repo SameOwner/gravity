@@ -77,7 +77,7 @@ void Actor::collide(Actor& other) {
 bool Actor::field(Vector3& result) {
 	Vector3 hitPos;
 	if (world_->getField()->getMesh().collide_line(prevPosition_ + rotation_.Up()*(body_->radius() + body_->length()*0.5f), position_ + rotation_.Up()*(body_->radius() + body_->length()*0.5f), (VECTOR*)&hitPos)) {
-		position_ -= hitPos - position_ + rotation_.Down()*(body_->length()*0.5f+body_->radius());
+		position_ -= hitPos - position_ + rotation_.Up()*(body_->length()*0.5f+body_->radius());
 	}
 	Vector3 hitcenter;
 	if (world_->getField()->getMesh().collide_capsule(position_ + rotation_.Up()*(body_->length()*0.5f), position_ + rotation_.Down()*(body_->length()*0.5f), body_->radius(), (VECTOR*)&hitcenter))

@@ -21,6 +21,7 @@ public:
 	void setTarget(const std::shared_ptr<Actor>& target);
 	//回転行列を設定する
 	void setUpVector(const Vector3& up);
+	Vector3 getUpVector()const;
 private:
 	//追跡対象
 	std::weak_ptr<Actor> target_;
@@ -35,9 +36,11 @@ private:
 	Vector3 camerafwPos_{ Vector3::Zero };
 	//カメラの回転
 	Vector2 rotate_{ Vector2::Zero };
+
+
+	Vector3 upVector_{ Vector3::Up };
 	//注目する位置を動かすベクトル
 	Vector3 moveTargetPos_{ Vector3::Zero };
-	Vector3 upVector_{ Vector3::Up };
 	//補正ベクトル
 	Vector3 correctPos_{ Vector3{0.0f,5.0f,0.0f} };
 };
