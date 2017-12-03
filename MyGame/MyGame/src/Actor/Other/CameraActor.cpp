@@ -1,5 +1,7 @@
 #include "CameraActor.h"
 #include"../../Input/InputChecker.h"
+#include"../../Graphic/DebugDraw.h"
+#include"../../Define.h"
 
 //カメラを離す距離
 const float defaultCameraDistance = 30.0f;
@@ -18,7 +20,7 @@ void CameraActor::initialize()
 	camerafwPos_ = Vector3::Zero;
 	setUpVector(Vector3::Up);
 	target_.reset();
-	Camera::GetInstance().SetRange(0.1f, 1000.0f);
+	Camera::GetInstance().SetRange(0.1f, 10000.0f);
 	Camera::GetInstance().SetViewAngle(60.0f);
 }
 
@@ -39,18 +41,20 @@ void CameraActor::update(float deltaTime)
 	movePos.y = -cameraDistance_*MathHelper::Sin(rotate_.y);
 	movePos.z = -cameraDistance_*MathHelper::Cos(rotate_.x) * MathHelper::Cos(rotate_.y);
 
-	
+	movePos = movePos*rotation_;
+
 	//プレイヤー用の設定
 	camerafwPos_ = (-movePos).Normalize();
 
-	//向きを調べて、それに応じた回転量にしてあげる必要がある
-	float dot = Vector3::Dot(Vector3::Up, upVector_);
-	Vector3 axis = Vector3::Cross(Vector3::Up, upVector_);
+	////////////向きを調べて、それに応じた回転量にしてあげる必要がある
+	//////////float dot = Vector3::Dot(Vector3::Up, upVector_);
+	//////////Vector3 axis = Vector3::Cross(Vector3::Up, upVector_);
+	//////////axis = axis.Normalize();
 
-	//movePosを回転させて、向きをUpベクトルに合わせる
-	float angle = MathHelper::ACos(dot);
-	movePos = movePos* Matrix::CreateFromAxisAngle(axis, angle);
-
+	//////////test = axis;
+	////////////movePosを回転させて、向きをUpベクトルに合わせる
+	//////////float angle = MathHelper::ACos(dot);
+	//movePos = movePos* Matrix::CreateFromAxisAngle(axis, angle);
 
 	//プレイヤー用の設定
 	Vector3 mp = movePos;
@@ -77,6 +81,7 @@ void CameraActor::update(float deltaTime)
 
 void CameraActor::draw() const
 {
+	DebugDraw::DebugDrawFormatString(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, GetColor(255, 255, 255), "%f:%f:%f", test.x, test.y, test.z);
 	//DrawLine3D(target_.lock()->getPosition(), target_.lock()->getPosition() + test, GetColor(255, 0, 0));
 	//DrawLine3D(target_.lock()->getPosition(), target_.lock()->getPosition() + rotation_.Up(), GetColor(0, 255, 0));
 	//DrawLine3D(target_.lock()->getPosition(), target_.lock()->getPosition() + rotation_.Forward(), GetColor(0, 0, 255));
@@ -94,8 +99,8 @@ void CameraActor::setTarget(const std::shared_ptr<Actor>& target)
 void CameraActor::setUpVector(const Vector3 & up)
 {
 	upVector_ = up;
-	//rotation_.Up(up);
-	//rotation_.NormalizeRotationMatrix_BaseUp();
+	rotation_.Up(up);
+	rotation_.NormalizeRotationMatrix_BaseUp();
 }
 
 Vector3 CameraActor::getUpVector() const

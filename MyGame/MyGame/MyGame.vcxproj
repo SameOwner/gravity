@@ -158,7 +158,6 @@
     <ClCompile Include="src\Actor\Body\OrientedBoundingBox.cpp" />
     <ClCompile Include="src\Actor\Body\Ray.cpp" />
     <ClCompile Include="src\Actor\Other\CameraActor.cpp" />
-    <ClCompile Include="src\Actor\Other\log.cpp" />
     <ClCompile Include="src\Actor\Player\Player.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
     <ClCompile Include="src\Conv\DXConverter.cpp" />

@@ -37,7 +37,7 @@ private:
 	//カメラの回転
 	Vector2 rotate_{ Vector2::Zero };
 
-
+	Vector3 test;
 	Vector3 upVector_{ Vector3::Up };
 	//注目する位置を動かすベクトル
 	Vector3 moveTargetPos_{ Vector3::Zero };
