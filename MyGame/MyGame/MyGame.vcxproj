@@ -216,6 +216,7 @@
     <ClInclude Include="src\Actor\Body\OrientedBoundingBox.h" />
     <ClInclude Include="src\Actor\Body\Ray.h" />
     <ClInclude Include="src\Actor\Other\CameraActor.h" />
+    <ClInclude Include="src\Actor\Other\CheckPoint.h" />
     <ClInclude Include="src\Actor\Player\Player.h" />
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Conv\ByteConverter.h" />
@@ -226,6 +227,8 @@
     <ClInclude Include="src\Game\MyGame.h" />
     <ClInclude Include="src\Game\Time.h" />
     <ClInclude Include="src\Graphic\AnimationDx.h" />
+    <ClInclude Include="src\Graphic\AnimationOutSide.h" />
+    <ClInclude Include="src\Graphic\AnimLoader.h" />
     <ClInclude Include="src\Graphic\BlendMode.h" />
     <ClInclude Include="src\Graphic\DebugDraw.h" />
     <ClInclude Include="src\Graphic\EffekseerManager.h" />

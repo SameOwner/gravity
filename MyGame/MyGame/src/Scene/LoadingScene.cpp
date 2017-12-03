@@ -41,8 +41,18 @@ void LoadingScene::LoadModel()
 {
 	std::string defaultPath = "res/Model/";//全リソース共通パス
 
-	Model::GetInstance().Load(defaultPath + "sivira/sivira.pmx", MODEL_ID::MODEL_PLAYER);
+	Model::GetInstance().Load(defaultPath + "alicia/model.mv1", MODEL_ID::MODEL_PLAYER);
 
+	std::list<std::string> anims{
+		defaultPath + "alicia/idle.mv1",
+		defaultPath + "alicia/run.mv1",
+		defaultPath + "alicia/jump_up.mv1",
+		defaultPath + "alicia/float.mv1",
+		defaultPath + "alicia/jump_down.mv1",
+		defaultPath + "alicia/slide.mv1",
+		defaultPath + "alicia/fly.mv1"
+	};
+	AnimLoader::getInstance().loadAnims(MODEL_ID::MODEL_PLAYER, anims);
 }
 
 void LoadingScene::LoadEffect()

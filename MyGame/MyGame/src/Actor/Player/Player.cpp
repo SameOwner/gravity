@@ -3,11 +3,11 @@
 #include"../../Input/InputChecker.h"
 #include"../Other/CameraActor.h"
 #include"../../Field/FieldBase.h"
+#include"../../Graphic/AnimLoader.h"
 
 Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
-	Actor(world,"Player",position,body)
+	Actor(world,"Player",position,body),animation_(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER))
 {
-	animation_.SetHandle(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER));
 	//animation_.ChangeAnim()
 	playerUpdateFunc_[Player_State::Idle] = [this](float deltaTime) {update_Idle(deltaTime); };
 	playerToNextModeFunc_[Player_State::Idle]= [this]() {to_Idle(); };
@@ -62,7 +62,7 @@ void Player::update(float deltaTime)
 {
 	playerUpdateFunc_[state_](deltaTime);
 
-	animation_.Update(deltaTime);
+	animation_.update(MathHelper::Sign(deltaTime)*0.5f);
 
 	position_ += velocity_;
 	velocity_ *= 0.8f;
@@ -130,8 +130,8 @@ bool Player::change_State(Player_State state)
 	return true;
 }
 
-void Player::change_Animation(Player_Animation animID, float animFrame, float animSpeed, bool isLoop) {
-	animation_.ChangeAnim((int)animID, animFrame, animSpeed, isLoop);
+void Player::change_Animation(Player_Animation animID,float animFrame,float animSpeed, bool isLoop,float blendRate) {
+	animation_.changeAnimation(AnimLoader::getInstance().getAnimKey(MODEL_ID::MODEL_PLAYER,(int)animID), isLoop, animSpeed,blendRate, animFrame);
 }
 
 void Player::addGravity()
@@ -179,7 +179,11 @@ void Player::update_Idle(float deltaTime)
 
 	if (prevfloor_)gravity_ = 0.0f;
 	Vector2 velocity = InputChecker::GetInstance().Stick();
-	if (velocity.Length() <= 0.2f)return;
+	if (velocity.Length() <= 0.2f) {
+		change_Animation(Player_Animation::Idle);
+		return;
+	}
+	change_Animation(Player_Animation::Run);
 
 	Vector3 frameVelocity = Vector3::Zero;
 	if (!world_->getCamera().expired()) {
@@ -234,7 +238,7 @@ void Player::update_Slide(float deltaTime)
 		break;
 	}
 	case 3: {
-		frameVelocity += world_->getCamera().lock()->getMoveForwardPos()*15.f;
+		frameVelocity += world_->getCamera().lock()->getMoveForwardPos()*25.0f;
 		break;
 	}
 	default:
@@ -359,7 +363,7 @@ void Player::update_Fly(float deltaTime)
 		rotation_.NormalizeRotationMatrix_BaseUp();
 		if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
 		position_ = hitPos + rotation_.Up()*(body_->radius()+body_->length()*0.5f);
-		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::WallRun));// playerUpdateFunc_[state_](deltaTime);
+		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
 		return;
 	}
 
@@ -391,6 +395,7 @@ void Player::update_WallRun(float deltaTime)
 	//}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::B)) {
 		if (change_State_and_Anim(Player_State::FloatJump, Player_Animation::Jump));// playerUpdateFunc_[state_](deltaTime);
+		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
 		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
@@ -403,8 +408,11 @@ void Player::update_WallRun(float deltaTime)
 
 	if (prevfloor_)gravity_ = 0.0f;
 	Vector2 velocity = InputChecker::GetInstance().Stick();
-	if (velocity.Length() <= 0.2f)return;
-
+	if (velocity.Length() <= 0.2f) {
+		change_Animation(Player_Animation::Idle);
+		return;
+	}
+	change_Animation(Player_Animation::WallRun);
 	Vector3 frameVelocity = Vector3::Zero;
 	if (!world_->getCamera().expired()) {
 		frameVelocity = world_->getCamera().lock()->getMoveForwardPos()*velocity.y*10.0f;//ëOï˚å¸Ç÷ÇÃà⁄ìÆó 
@@ -446,7 +454,7 @@ void Player::update_FloatJump(float deltaTime)
 
 	//ë´èÍÇ…Ç¬Ç¢ÇƒÇΩÇÁë“ã@Ç…ñﬂÇÈ
 	if (prevfloor_) {
-		change_State_and_Anim(Player_State::WallRun, Player_Animation::WallRun);
+		change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle);
 		return;
 	}
 
@@ -486,7 +494,7 @@ void Player::to_FloatFall()
 void Player::update_FloatFall(float deltaTime)
 {
 	if (prevfloor_) {
-		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::WallRun));// playerUpdateFunc_[state_](deltaTime);
+		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {

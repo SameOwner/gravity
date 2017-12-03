@@ -1,6 +1,6 @@
 #pragma once
 #include"../Actor.h"
-#include"../../Graphic/AnimationDx.h"
+#include"../../Graphic/AnimationOutSide.h"
 #include"../Body/BoundingCapsule.h"
 #include<map>
 
@@ -20,17 +20,19 @@ public:
 	};
 	enum class Player_Animation {
 		Idle=0,
-		Jump=0,
-		Slide=0,
-		SlideJump=0,
-		Float=0,
-		Fly=0,
-		WallRun=0,
-		FloatJump = 0,
-		FloatFall = 0,
-		Fall=0,
+		Run=1,
+		Jump=3,
+		Slide=5,
+		SlideJump=3,
+		Float=3,
+		Fly=6,
+		WallRun=1,
+		FloatJump = 3,
+		FloatFall = 3,
+		Fall=3,
 
 	};
+
 public:
 	Player(IWorld* world, const Vector3& position, const IBodyPtr& body = std::make_shared<BoundingCapsule>(Vector3{0.0f,0.0f,0.0f},Matrix::Identity,15.0f,4.0f));
 
@@ -50,7 +52,7 @@ private:
 	//状態の更新
 	bool change_State(Player_State state);
 	//アニメーションの変更
-	void change_Animation(Player_Animation animID, float animFrame = 0.0f, float animeSpeed = 1.0f, bool isLoop = true);
+	void change_Animation(Player_Animation animID, float animFrame = 0.0f, float animeSpeed = 1.0f, bool isLoop = true, float blendRate=1.0f);
 
 	//重力値の加算
 	void addGravity();
@@ -116,7 +118,7 @@ private:
 
 	
 private:
-	AnimationDx animation_;
+	AnimationOutSide animation_;
 	//自身の状態
 	Player_State state_;
 	//重力倍率
