@@ -23,6 +23,9 @@ public:
 	void findActor(const std::string& name, std::list<std::weak_ptr<Actor>>& actorList);
 	// メッセージ処理
 	void handleMessage(EventMessage message, void* param);
+
+	unsigned int getSize(ActorGroup group) const;
+
 	// コピー禁止
 	ActorManager(const ActorManager& other) = delete;
 	ActorManager& operator = (const ActorManager& other) = delete;

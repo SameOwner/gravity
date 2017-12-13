@@ -1,6 +1,6 @@
 #pragma once
 #include"Scene.h"
-
+#include"../Field/PointGenerator.h"
 #include"../World/World.h"
 
 class Player;
@@ -8,6 +8,7 @@ class Player;
 class GamePlayScene:public Scene {
 public:
 	GamePlayScene();
+	~GamePlayScene() = default;
 
 	virtual void start()override;
 	virtual void update(float deltaTime)override;
@@ -16,6 +17,7 @@ public:
 	virtual void end() override;
 
 private:
+	PointGenerator pointGenerator_;
 	World world_;
 	std::shared_ptr<Player> player_;
 };

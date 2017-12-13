@@ -59,6 +59,11 @@ void World::findActors(const std::string & name, std::list<ActorPtr>& actorList)
 
 }
 
+int World::getActorCount(ActorGroup group) const
+{
+	return actors_.getSize(group);
+}
+
 void World::sendMessage(EventMessage message, void * param)
 {
 	actors_.handleMessage(message, param);

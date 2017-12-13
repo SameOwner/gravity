@@ -24,6 +24,8 @@ private:
 	void LoadBGM();
 	//SEの読み込み
 	void LoadSE();
+	//シェーダーの読み込み
+	void LoadShader();
 	//その他ステージ等の読み込み
 	void LoadEtcetera();
 

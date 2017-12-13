@@ -4,3 +4,4 @@
 #include"../Sound/Sound.h"
 #include"../Graphic/FontManager.h"
 #include"../Graphic/AnimLoader.h"
+#include"../Graphic/Shader/ShaderManager.h"

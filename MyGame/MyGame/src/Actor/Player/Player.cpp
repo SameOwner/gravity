@@ -4,9 +4,14 @@
 #include"../Other/CameraActor.h"
 #include"../../Field/FieldBase.h"
 #include"../../Graphic/AnimLoader.h"
+#include"../../Graphic/Sprite.h"
+#include"../../ID/EnumIDs.h"
+#include"../../Define.h"
+#include"../Other/CameraActor.h"
 
 Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
-	Actor(world,"Player",position,body),animation_(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER))
+	Actor(world,"Player",position,body),animation_(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER)),
+	floatPower_(MaxFloatPower), wind_()
 {
 	//animation_.ChangeAnim()
 	playerUpdateFunc_[Player_State::Idle] = [this](float deltaTime) {update_Idle(deltaTime); };
@@ -65,7 +70,9 @@ void Player::update(float deltaTime)
 	animation_.update(MathHelper::Sign(deltaTime)*0.5f);
 
 	position_ += velocity_;
-	velocity_ *= 0.8f;
+	velocity_ *= velocityMultPower;
+
+	velocityMultPower = DefVelocityMult;//velocityの乗算割合を元に戻す
 
 	Vector3 result;
 	if (field(result))position_ = result;
@@ -84,23 +91,32 @@ void Player::draw() const
 	animation_.Draw(Matrix(Matrix::Identity).Translation(Vector3::Down*body_->length()*0.5f - Vector3(0.0f, 2.f, 0.0f))*rotation_*Matrix::CreateFromAxisAngle(rotation_.Up(), 180.0f).Translation(position_));
 	body_->transform(getPose())->draw();
 
-	Vector3 hitPos;
-	Vector3 hitNormal;
-	if (world_->getField()->getMesh().collide_line(position_, position_ + flyDirection_*100.0f, (VECTOR*)&hitPos, (VECTOR*)&hitNormal)) {
-		DrawLine3D(hitPos, hitPos + (hitNormal*10.0f), GetColor(255, 0, 0));
-	}
+	wind_.draw();
+
+	DebugDraw::DebugDrawFormatString(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, GetColor(255, 255, 255), "%f:%f:%f", position_.x, position_.y, position_.z);
+
+	DrawCircleGauge(100, 100, floatPower_, Sprite::GetInstance().GetHandle(SPRITE_ID::SPRITE_FLOATGAUGE));
+	//Vector3 hitPos;
+	//Vector3 hitNormal;
+	//if (world_->getField()->getMesh().collide_line(position_, position_ + flyDirection_*100.0f, (VECTOR*)&hitPos, (VECTOR*)&hitNormal)) {
+	//	DrawLine3D(hitPos, hitPos + (hitNormal*10.0f), GetColor(255, 0, 0));
+	//}
+
 }
 
 void Player::aerialVelocityKeep()
 {
 	velocity_.x *= 2.3f - MathHelper::Clamp(std::abs(velocity_.x), 1.0f, 1.05f);
 	velocity_.z *= 2.3f - MathHelper::Clamp(std::abs(velocity_.z), 1.0f, 1.05f);
+	//velocityMultPower = 1.0f;
+
 
 }
 
 void Player::floatVelocityKeep()
 {
-	velocity_ *= 1.2f;
+	//velocity_ *= 1.2f;
+	velocityMultPower = 1.0f;
 }
 
 bool Player::change_State_and_Anim(Player_State state, Player_Animation animID, float animFrame, float animSpeed, bool isLoop)
@@ -136,14 +152,14 @@ void Player::change_Animation(Player_Animation animID,float animFrame,float anim
 
 void Player::addGravity()
 {
-	gravity_ += 0.05f;
+	gravity_ += 0.1f;
 	velocity_ += Vector3::Down*gravity_;
 
 }
 
 void Player::addFloatGravity()
 {
-	gravity_ += 0.002f;
+	gravity_ += 0.05f;
 	velocity_ += -world_->getCamera().lock()->getUpVector()*gravity_;
 }
 
@@ -153,6 +169,8 @@ void Player::to_Idle()
 	rotation_.Up(Vector3::Up);
 	rotation_ = rotation_.NormalizeRotationMatrix_BaseUp();
 	if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
+
+	floatPower_ = MaxFloatPower;
 
 }
 
@@ -215,10 +233,19 @@ void Player::end_Move()
 
 void Player::to_Slide()
 {
+	wind_.initialize();
+	world_->getCamera().lock()->inCamera(15.0f);
 }
 
 void Player::update_Slide(float deltaTime)
 {
+	wind_.update(deltaTime);
+
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
 	addGravity();
 	if (prevfloor_)gravity_ = 0.0f;
 
@@ -237,6 +264,14 @@ void Player::update_Slide(float deltaTime)
 
 		break;
 	}
+	//片方だけ押されてる場合		
+	case 1: {
+	}
+	case 2: {
+		velocityMultPower = 0.9f;
+		break;
+	}
+	//両方押されてる場合
 	case 3: {
 		frameVelocity += world_->getCamera().lock()->getMoveForwardPos()*25.0f;
 		break;
@@ -260,11 +295,13 @@ void Player::update_Slide(float deltaTime)
 	velocity_ += frameVelocity;
 	
 	if(frameVelocity.Length()>=0.01f)rotation_ = rotation_.Forward(frameVelocity.Normalize()).NormalizeRotationMatrix();
-
+	else if (mode == 1 || mode == 2)rotation_ = rotation_.Forward(world_->getCamera().lock()->getMoveForwardPos()).NormalizeRotationMatrix();
 }
 
 void Player::end_Slide()
 {
+	wind_.stop();
+	world_->getCamera().lock()->outCamera();
 }
 
 void Player::to_Jump()
@@ -306,6 +343,11 @@ void Player::to_SlideJump()
 
 void Player::update_SlideJump(float)
 {
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
 	addGravity();
 	aerialVelocityKeep();
 
@@ -334,6 +376,11 @@ void Player::to_Float()
 
 void Player::update_Float(float deltaTime)
 {
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
 		if (change_State_and_Anim(Player_State::Fly, Player_Animation::Fly));// playerUpdateFunc_[state_](deltaTime);
 		return;
@@ -351,14 +398,23 @@ void Player::end_Float()
 
 void Player::to_Fly()
 {
-	if (!world_->getCamera().expired())flyDirection_ = world_->getCamera().lock()->getCameraForwardPos().Normalize();
+	if (!world_->getCamera().expired()) {
+		flyDirection_ = world_->getCamera().lock()->getCameraForwardPos().Normalize();
+		rotation_ = rotation_.Forward(flyDirection_).NormalizeRotationMatrix();
+	}
 }
 
 void Player::update_Fly(float deltaTime)
 {
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
+	//床を歩くかの判定
 	Vector3 hitPos;
 	Vector3 hitNormal;
-	if (world_->getField()->getMesh().collide_line(position_, position_ + flyDirection_*18.0f,(VECTOR*)&hitPos, (VECTOR*)&hitNormal)) {
+	if (world_->getField()->getMesh().collide_line(position_, position_ + flyDirection_*20.0f,(VECTOR*)&hitPos, (VECTOR*)&hitNormal)) {
 		rotation_.Up(hitNormal);
 		rotation_.NormalizeRotationMatrix_BaseUp();
 		if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
@@ -375,8 +431,21 @@ void Player::update_Fly(float deltaTime)
 		if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
 		return;
 	}
+	
+	//入力のチェック
+	Vector2 velocity = InputChecker::GetInstance().Stick();
+	Vector3 frameVelocity = Vector3::Zero;
+	if (velocity.Length() > 0.2f) {
+		if (!world_->getCamera().expired()) {
+			frameVelocity = world_->getCamera().lock()->getUpVector()*velocity.y*10.0f;//前方向への移動量
+			frameVelocity += world_->getCamera().lock()->getMoveRightPos()*velocity.x*10.0f;
+		}
+		frameVelocity *= deltaTime;
+		velocity_ += frameVelocity;
+	}
 
-	velocity_ += flyDirection_*1.0f;
+	float flyPower = (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::B)) ? 1.5f : 1.0f;
+	velocity_ += flyDirection_*flyPower;
 }
 
 void Player::end_Fly()
@@ -389,10 +458,15 @@ void Player::to_WallRun()
 
 void Player::update_WallRun(float deltaTime)
 {
-	//if (!prevfloor_) {
-	//	if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
-	//	return;
-	//}
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
+	if (!prevfloor_) {
+		if (change_State_and_Anim(Player_State::FloatFall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::B)) {
 		if (change_State_and_Anim(Player_State::FloatJump, Player_Animation::Jump));// playerUpdateFunc_[state_](deltaTime);
 		return;
@@ -450,6 +524,11 @@ void Player::to_FloatJump()
 
 void Player::update_FloatJump(float deltaTime)
 {
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
 	addFloatGravity();
 
 	//足場についてたら待機に戻る
@@ -493,6 +572,11 @@ void Player::to_FloatFall()
 
 void Player::update_FloatFall(float deltaTime)
 {
+	if (!subFloatPower()) {
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
+		return;
+	}
+
 	if (prevfloor_) {
 		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
 		return;
@@ -540,4 +624,11 @@ void Player::update_Fall(float deltaTime)
 
 void Player::end_Fall()
 {
+}
+
+bool Player::subFloatPower()
+{
+	floatPower_ -= 0.1f;
+	floatPower_ = MathHelper::Clamp(floatPower_, 0.0f, MaxFloatPower);
+	return floatPower_ > 0.0f;
 }

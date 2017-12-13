@@ -19,6 +19,8 @@ public:
 	virtual ActorPtr findActor(const std::string& name) = 0;
 	// アクターの複数検索
 	virtual void findActors(const std::string& name, std::list<ActorPtr>& actorList) = 0;
+	//アクターの数を取得
+	virtual int getActorCount(ActorGroup group)const = 0;
 	// メッセージの送信
 	virtual void sendMessage(EventMessage message, void* param = nullptr) = 0;
 	// フィールドの取得

@@ -43,6 +43,10 @@ public:
 	void setNumber(int cn);
 	//識別番号の取得
 	int getNumber()const;
+	//種類の設定
+	void setGroup(ActorGroup group);
+	//種類の取得
+	ActorGroup getGroup()const;
 	//名前の取得
 	std::string getName()const;
 	//判定の取得
@@ -53,7 +57,8 @@ public:
 	Matrix getRotation()const;
 	// 変換行列の取得
 	Matrix Actor::getPose() const;
-
+	//子供の数を取得
+	unsigned int getChildCount()const;
 	//死んでるか
 	bool isDead()const;
 	//死亡させる
@@ -82,6 +87,8 @@ public:
 protected:
 	//キャラクター識別番号
 	int characterNumber_{ -1 };
+	//自身の種類
+	ActorGroup group_;
 	// ワールド
 	IWorld*	world_{ nullptr };
 	// 名前

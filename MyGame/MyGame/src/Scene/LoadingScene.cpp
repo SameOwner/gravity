@@ -14,6 +14,7 @@ void LoadingScene::start() {
 	LoadFont();
 	LoadBGM();
 	LoadSE();
+	LoadShader();
 	LoadEtcetera();
 
 	isEnd_ = true;
@@ -34,7 +35,9 @@ void LoadingScene::end() {
 void LoadingScene::LoadSprite()
 {
 	std::string defaultPath = "res/Sprite/";//全リソース共通パス
-
+	Sprite::GetInstance().Load(defaultPath + "stepgauge.png", SPRITE_ID::SPRITE_FLOATGAUGE);
+	Sprite::GetInstance().Load(defaultPath+"wind.png", SPRITE_ID::SPRITE_WINDEFFECT);
+	
 }
 
 void LoadingScene::LoadModel()
@@ -58,10 +61,8 @@ void LoadingScene::LoadModel()
 void LoadingScene::LoadEffect()
 {
 	//Modelクラスを利用したエフェクト
-	std::string defaultPath = "res/Sprite/Effect/";//全リソース共通パス
+	std::string defaultPath = "res/Effekseer";//全リソース共通パス
 
-	//Effekseerを利用したエフェクト
-	defaultPath = "res/Effekseer/";
 }
 
 void LoadingScene::LoadFont()
@@ -81,6 +82,12 @@ void LoadingScene::LoadSE()
 {
 	std::string defaultPath = "res/Sound/se/";//全リソース共通パス
 	//Sound::GetInstance().LoadSE(defaultPath + "check.mp3", SE_ID::CHECK_SE);
+}
+
+void LoadingScene::LoadShader()
+{
+	std::string defaultPath = "res/Shader/";//全リソース共通パス
+	ShaderManager::getInstance().LoadShader(ShaderID::SKYBOX_SHADER, defaultPath + "SkyBoxVertexShader.cso", defaultPath + "SkyBoxPixelShader.cso");
 }
 
 void LoadingScene::LoadEtcetera()

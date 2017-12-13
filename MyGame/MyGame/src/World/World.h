@@ -24,6 +24,8 @@ public:
 	virtual ActorPtr findActor(const std::string& name)override;
 	// アクターの複数検索
 	virtual void findActors(const std::string& name, std::list<ActorPtr>& actorList)override;
+	//アクターの数を取得
+	virtual int getActorCount(ActorGroup group)const override;
 	// メッセージの送信
 	virtual void sendMessage(EventMessage message, void* param = nullptr)override;
 	// フィールドの取得

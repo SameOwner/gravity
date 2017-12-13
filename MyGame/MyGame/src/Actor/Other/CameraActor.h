@@ -22,13 +22,25 @@ public:
 	//回転行列を設定する
 	void setUpVector(const Vector3& up);
 	Vector3 getUpVector()const;
+	//カメラ距離を調整する
+	void inCamera(float distance);
+	void outCamera();
 private:
+	//カメラを離す距離
+	const float defaultCameraDistance{ 30.0f };
+	//補間の時間
+	float LerpTime{ 0.3f };
+
+	float lerpTimer_{ 0.0f };
+	//寄るタイマー
+	float cameraupLerpTimer_{ 1.0f };
 	//追跡対象
 	std::weak_ptr<Actor> target_;
 	//カメラの有効無効
 	bool isActive_{ true };
 	//キャラクターとカメラの距離
-	float cameraDistance_{ 0.0f };
+	float cameraDistance_{ defaultCameraDistance };
+	float nextCameraDistance_{ defaultCameraDistance };
 	//カメラを基準とした前移動ベクトル
 	Vector3 movefwPos_{ Vector3::Zero };
 	//カメラを基準とした横移動ベクトル
@@ -36,11 +48,16 @@ private:
 	Vector3 camerafwPos_{ Vector3::Zero };
 	//カメラの回転
 	Vector2 rotate_{ Vector2::Zero };
-
-	Vector3 test;
+	//前の回転行列
+	Matrix prevRotation_{ Matrix::Identity };
 	Vector3 upVector_{ Vector3::Up };
+	Vector3 prevUpVector_;
 	//注目する位置を動かすベクトル
 	Vector3 moveTargetPos_{ Vector3::Zero };
 	//補正ベクトル
 	Vector3 correctPos_{ Vector3{0.0f,5.0f,0.0f} };
+
+
+	
+	float test;
 };

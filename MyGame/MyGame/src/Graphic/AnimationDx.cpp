@@ -6,6 +6,14 @@
 #include <math.h>
 #include <algorithm>
 
+AnimationDx::~AnimationDx()
+{
+	// 前アニメーションをデタッチ
+	MV1DetachAnim(modelHandle_, anim_);
+	MV1DetachAnim(modelHandle_, prevAnim_);
+	MV1DeleteModel(modelHandle_);
+}
+
 void AnimationDx::Update(const float frameTime)
 {
 	// フラグ初期化

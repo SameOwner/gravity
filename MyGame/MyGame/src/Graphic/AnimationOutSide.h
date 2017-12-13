@@ -11,7 +11,10 @@ public:
 
 	}
 	~AnimationOutSide() {
-
+		// 前アニメーションをデタッチ
+		MV1DetachAnim(model_, currentAnim_);
+		MV1DetachAnim(model_, previousAnim_);
+		MV1DeleteModel(model_);
 	}
 
 	//frameTime=フレーム変更割合

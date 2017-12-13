@@ -7,7 +7,8 @@ enum class MODEL_ID {
 	MODEL_STAGE,
 };
 enum class SPRITE_ID {
-
+	SPRITE_FLOATGAUGE,//浮遊ゲージスプライト
+	SPRITE_WINDEFFECT//風エフェクトスプライト
 };
 enum class BGM_ID {
 
@@ -43,4 +44,5 @@ enum class EventMessage {
 enum class ActorGroup {
 	ETCETERA_ACTOR,//ゲームに関与しないアクター
 	PLAYER_ACTOR,//プレイヤー
+	POINT_ACTOR,//チェックポイント
 };

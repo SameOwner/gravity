@@ -2,6 +2,7 @@
 #include<DxLib.h>
 #include"../Math/Vector3.h"
 #include"../Define.h"
+#include"../Graphic/Shader/ShaderManager.h"
 
 // コンストラクタ
 FieldBase::FieldBase(int field, int skybox) :

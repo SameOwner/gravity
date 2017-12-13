@@ -2,13 +2,14 @@
 #include<algorithm>
 #include"../Field/FieldBase.h"
 #include"Body/Base/HitInfo.h"
+#include"../ID/EnumIDs.h"
 
-Actor::Actor():world_(nullptr),name_("Null"),position_(Vector3::Zero),body_(std::make_shared<DummyBody>()),children_()
+Actor::Actor():world_(nullptr),name_("Null"),position_(Vector3::Zero),body_(std::make_shared<DummyBody>()),children_(),group_(ActorGroup::ETCETERA_ACTOR)
 {
 }
 
 Actor::Actor(IWorld * world, const std::string & name, const Vector3 & position, const IBodyPtr & body):
-	world_(world),name_(name),position_(position),body_(body), children_()
+	world_(world),name_(name),position_(position),body_(body), children_(), group_(ActorGroup::ETCETERA_ACTOR)
 {
 }
 
@@ -117,6 +118,16 @@ int Actor::getNumber() const
 	return characterNumber_;
 }
 
+void Actor::setGroup(ActorGroup group)
+{
+	group_ = group;
+}
+
+ActorGroup Actor::getGroup() const
+{
+	return group_;
+}
+
 std::string Actor::getName() const
 {
 	return name_;
@@ -139,6 +150,11 @@ Matrix Actor::getRotation() const
 
 Matrix Actor::getPose() const {
 	return Matrix(rotation_).Translation(position_);
+}
+
+unsigned int Actor::getChildCount() const
+{
+	return children_.size();
 }
 
 bool Actor::isDead() const

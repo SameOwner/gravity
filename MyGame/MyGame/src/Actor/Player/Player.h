@@ -2,6 +2,8 @@
 #include"../Actor.h"
 #include"../../Graphic/AnimationOutSide.h"
 #include"../Body/BoundingCapsule.h"
+#include"../../Effect/SpriteEffect/CameraWind.h"
+
 #include<map>
 
 class Player:public Actor {
@@ -116,20 +118,33 @@ private:
 	void update_Fall(float deltaTime);
 	void end_Fall();
 
-	
+	//浮遊ゲージ減少(0以下になったらfalseを返す)
+	bool subFloatPower();
 private:
+	//最大浮遊ゲージ値
+	const float MaxFloatPower{ 100.0f };
+	//基本的なvelocityの乗算割合
+	const float DefVelocityMult{ 0.8f };
 	AnimationOutSide animation_;
 	//自身の状態
 	Player_State state_;
 	//重力倍率
 	float gravity_{ 0.0f };
 	
+	//浮遊ゲージ
+	float floatPower_;
+
 	//飛行方向
 	Vector3 flyDirection_{ Vector3::Zero };
 	//前フレ床についてたか
 	bool prevfloor_{ false };
 
+	float velocityMultPower{ DefVelocityMult };
+
 	std::map<Player_State, std::function<void(float)>> playerUpdateFunc_;
 	std::map<Player_State, std::function<void()>> playerEndModeFunc_;
 	std::map<Player_State, std::function<void()>> playerToNextModeFunc_;
+
+private:
+	CameraWind wind_;
 };

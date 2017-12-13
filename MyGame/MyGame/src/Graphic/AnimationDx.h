@@ -8,7 +8,7 @@ public:
 	// コンストラクタ
 	explicit AnimationDx() = default;
 	// デストラクタ
-	~AnimationDx() = default;
+	~AnimationDx();
 	// 更新
 	void Update(const float frameTime);
 	// 描画
