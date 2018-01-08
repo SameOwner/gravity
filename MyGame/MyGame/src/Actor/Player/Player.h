@@ -3,6 +3,7 @@
 #include"../../Graphic/AnimationOutSide.h"
 #include"../Body/BoundingCapsule.h"
 #include"../../Effect/SpriteEffect/CameraWind.h"
+#include"../../Method/CountTimer.h"
 
 #include<map>
 
@@ -19,6 +20,9 @@ public:
 		FloatJump,//壁貼りつきジャンプ
 		FloatFall,//壁貼りつき落下
 		Fall,//落下
+		Blow,//吹き飛ばし
+		Down,//転ぶ
+		GetUp,//起き上がり
 	};
 	enum class Player_Animation {
 		Idle=0,
@@ -27,6 +31,9 @@ public:
 		Slide=5,
 		SlideJump=3,
 		Float=3,
+		Blow=7,
+		Down = 8,
+		GetUp = 9,
 		Fly=6,
 		WallRun=1,
 		FloatJump = 3,
@@ -47,6 +54,12 @@ public:
 	//空中時はx,zの移動ベクトルを大きくする
 	void aerialVelocityKeep();
 	void floatVelocityKeep();
+
+	void hit(const Vector3& direction);
+
+	//メッセージの受信
+	virtual void receiveMessage(EventMessage message, void* param) override;
+
 private:
 
 	//状態変更とアニメーション変更を同時に行う
@@ -118,6 +131,21 @@ private:
 	void update_Fall(float deltaTime);
 	void end_Fall();
 
+	//吹き飛ばし
+	void to_Blow();
+	void update_Blow(float deltaTime);
+	void end_Blow();
+
+	//ダウン
+	void to_Down();
+	void update_Down(float deltaTime);
+	void end_Down();
+
+	//起き上がり
+	void to_GetUp();
+	void update_GetUp(float deltaTime);
+	void end_GetUp();
+
 	//浮遊ゲージ減少(0以下になったらfalseを返す)
 	bool subFloatPower();
 private:
@@ -140,6 +168,10 @@ private:
 	bool prevfloor_{ false };
 
 	float velocityMultPower{ DefVelocityMult };
+
+	//吹き飛ばし方向
+	Vector3 blowDirection_{ Vector3::Zero };
+	CountTimer downTimer_{};
 
 	std::map<Player_State, std::function<void(float)>> playerUpdateFunc_;
 	std::map<Player_State, std::function<void()>> playerEndModeFunc_;

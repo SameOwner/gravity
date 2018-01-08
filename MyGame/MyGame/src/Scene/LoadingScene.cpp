@@ -53,7 +53,10 @@ void LoadingScene::LoadModel()
 		defaultPath + "alicia/float.mv1",
 		defaultPath + "alicia/jump_down.mv1",
 		defaultPath + "alicia/slide.mv1",
-		defaultPath + "alicia/fly.mv1"
+		defaultPath + "alicia/fly.mv1",
+		defaultPath + "alicia/blow.mv1",
+		defaultPath + "alicia/down.mv1",
+		defaultPath + "alicia/getup.mv1"
 	};
 	AnimLoader::getInstance().loadAnims(MODEL_ID::MODEL_PLAYER, anims);
 

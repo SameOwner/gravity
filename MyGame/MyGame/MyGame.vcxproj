@@ -283,6 +283,7 @@
     <ClInclude Include="src\Math\TwoDimensionalArray.h" />
     <ClInclude Include="src\Math\Vector2.h" />
     <ClInclude Include="src\Math\Vector3.h" />
+    <ClInclude Include="src\Method\CountTimer.h" />
     <ClInclude Include="src\Method\FunctionExecutor.h" />
     <ClInclude Include="src\Method\Header.h" />
     <ClInclude Include="src\Method\MethodExecutor.h" />

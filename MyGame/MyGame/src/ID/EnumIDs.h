@@ -39,7 +39,7 @@ enum class SceneType {
 
 //メッセージによるActor間の操作
 enum class EventMessage {
-
+	Hit_Car,
 };
 
 //Actorのグループ分け

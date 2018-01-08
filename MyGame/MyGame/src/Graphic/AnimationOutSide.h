@@ -29,16 +29,21 @@ public:
 		currentAnimTime_ += frameTime*animSpeed_;
 		if (currentAnimTime_ >= maxAnimTime_)
 		{
+			isEnd_ = true;
 			if (isLoop_) currentAnimTime_ = fmodf(currentAnimTime_, maxAnimTime_);
+			else currentAnimTime_ = maxAnimTime_;
 		}
 
 		// 前アニメーションをアタッチ
 		previousAnim_ = MV1AttachAnim(model_, 0, previousAnimKey_);
-		// 前アニメーション更新
-		float prevMaxAnimTime = MV1GetAttachAnimTotalTime(model_, previousAnim_);
-		previousAnimTime_ += frameTime*animSpeed_;
-		previousAnimTime_ = fmodf(previousAnimTime_, prevMaxAnimTime);
 
+		//前アニメーションがループ対応だったら
+		if (prevIsLoop_) {
+			// 前アニメーション更新
+			float prevMaxAnimTime = MV1GetAttachAnimTotalTime(model_, previousAnim_);
+			previousAnimTime_ += frameTime*animSpeed_;
+			previousAnimTime_ = fmodf(previousAnimTime_, prevMaxAnimTime);
+		}
 		// ブレンド率の更新
 		blendRate_ += RATE_TIME;
 		blendRate_ = max(0.0f, min(blendRate_, 1.0f));
@@ -78,12 +83,14 @@ public:
 		//アニメーション最大時間の更新
 		maxAnimTime_ = MV1GetAttachAnimTotalTime(model_, currentAnim_);
 
+		prevIsLoop_ = isLoop_;
 		isLoop_ = isLoop;
+		isEnd_ = false;
 		blendRate_ = 1.0f - blendRate;//ブレンド比率分前アニメーションをブレンドする
 		animSpeed_ = animSpeed;
 	}
 
-
+	bool isEnd()const { return isEnd_; }
 private:
 	int model_;//モデルハンドル
 	
@@ -102,7 +109,9 @@ private:
 	float maxAnimTime_{ 0.0f };//アニメーション最大時間
 
 	bool isLoop_{ true };//ループするか
+	bool prevIsLoop_{ true };//前アニメーションがループするか
 
+	bool isEnd_{ false };//終わったか
 private:
 	const float RATE_TIME = 0.1f;// ブレンドレートタイム
 

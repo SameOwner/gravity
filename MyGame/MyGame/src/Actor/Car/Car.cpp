@@ -38,4 +38,6 @@ void Car::draw() const
 
 void Car::onCollide(Actor & other)
 {
+	Vector3 hitdir = (other.getPosition() - position_);
+	other.receiveMessage(EventMessage::Hit_Car, (void*)&hitdir);
 }

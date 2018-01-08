@@ -54,6 +54,18 @@ Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 	playerToNextModeFunc_[Player_State::Fall] = [this]() {to_Fall(); };
 	playerEndModeFunc_[Player_State::Fall] = [this]() {end_Fall(); };
 
+	playerUpdateFunc_[Player_State::Blow] = [this](float deltaTime) {update_Blow(deltaTime); };
+	playerToNextModeFunc_[Player_State::Blow] = [this]() {to_Blow(); };
+	playerEndModeFunc_[Player_State::Blow] = [this]() {end_Blow(); };
+
+	playerUpdateFunc_[Player_State::Down] = [this](float deltaTime) {update_Down(deltaTime); };
+	playerToNextModeFunc_[Player_State::Down] = [this]() {to_Down(); };
+	playerEndModeFunc_[Player_State::Down] = [this]() {end_Down(); };
+
+	playerUpdateFunc_[Player_State::GetUp] = [this](float deltaTime) {update_GetUp(deltaTime); };
+	playerToNextModeFunc_[Player_State::GetUp] = [this]() {to_GetUp(); };
+	playerEndModeFunc_[Player_State::GetUp] = [this]() {end_GetUp(); };
+
 }
 
 void Player::initialize()
@@ -61,6 +73,7 @@ void Player::initialize()
 	state_ = Player_State::Idle;
 	gravity_ = 0.0f;
 	prevfloor_ = false;
+	blowDirection_ = Vector3::Zero;
 }
 
 void Player::update(float deltaTime)
@@ -74,8 +87,11 @@ void Player::update(float deltaTime)
 
 	velocityMultPower = DefVelocityMult;//velocityの乗算割合を元に戻す
 
+	//ぶつかったか
 	Vector3 result;
+	//壁とぶつけてから
 	if (field(result))position_ = result;
+	//床との接地判定
 	if (floor(result)) {
 		prevfloor_ = true;
 		position_ = result+rotation_.Up()*(body_->length()*0.5f+body_->radius());
@@ -119,6 +135,26 @@ void Player::floatVelocityKeep()
 	velocityMultPower = 1.0f;
 }
 
+void Player::hit(const Vector3& direction)
+{
+	blowDirection_ = Vector3(direction).Normalize();
+	blowDirection_ += Vector3::Up*0.2f;//一応打ち上げる
+	change_State_and_Anim(Player_State::Blow, Player_Animation::Blow, 0.0f, 1.0f, false);
+
+}
+
+void Player::receiveMessage(EventMessage message, void * param)
+{
+	switch (message)
+	{
+	case EventMessage::Hit_Car:
+		hit(*(Vector3*)param);
+		break;
+	default:
+		break;
+	}
+}
+
 bool Player::change_State_and_Anim(Player_State state, Player_Animation animID, float animFrame, float animSpeed, bool isLoop)
 {
 	//同じ状態には遷移しない
@@ -153,6 +189,7 @@ void Player::change_Animation(Player_Animation animID,float animFrame,float anim
 void Player::addGravity()
 {
 	gravity_ += 0.1f;
+	gravity_ = min(gravity_, 10.0f);//重力最大値
 	velocity_ += Vector3::Down*gravity_;
 
 }
@@ -160,6 +197,7 @@ void Player::addGravity()
 void Player::addFloatGravity()
 {
 	gravity_ += 0.05f;
+	gravity_ = min(gravity_, 10.0f);//重力最大値
 	velocity_ += -world_->getCamera().lock()->getUpVector()*gravity_;
 }
 
@@ -194,6 +232,7 @@ void Player::update_Idle(float deltaTime)
 		change_State_and_Anim(Player_State::Slide, Player_Animation::Slide);
 		return;
 	}
+
 
 	if (prevfloor_)gravity_ = 0.0f;
 	Vector2 velocity = InputChecker::GetInstance().Stick();
@@ -623,6 +662,65 @@ void Player::update_Fall(float deltaTime)
 }
 
 void Player::end_Fall()
+{
+}
+
+void Player::to_Blow()
+{
+	rotation_.Up(Vector3::Up);
+	rotation_ = rotation_.NormalizeRotationMatrix_BaseUp();
+	if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
+	downTimer_.set(10);//10フレームは接地判定をしない
+}
+
+void Player::update_Blow(float deltaTime)
+{
+	if (downTimer_()&&prevfloor_) {
+		change_State_and_Anim(Player_State::Down, Player_Animation::Down,0.0f,1.0f,false);// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+	addGravity();
+	velocity_ += blowDirection_;
+
+}
+
+void Player::end_Blow()
+{
+}
+
+void Player::to_Down()
+{
+	downTimer_.set(120);//120フレーム数える
+}
+
+void Player::update_Down(float deltaTime)
+{
+	//ダウン時間が終わったら次へ
+	if (downTimer_()) {
+		change_State_and_Anim(Player_State::GetUp, Player_Animation::GetUp,0.0f,1.0f,false);// playerUpdateFunc_[state_](deltaTime);
+		return;
+
+	}
+}
+
+void Player::end_Down()
+{
+}
+
+void Player::to_GetUp()
+{
+}
+
+void Player::update_GetUp(float deltaTime)
+{
+	if (animation_.isEnd()) {
+		change_State_and_Anim(Player_State::Idle, Player_Animation::Idle);// playerUpdateFunc_[state_](deltaTime);
+		return;
+	}
+
+}
+
+void Player::end_GetUp()
 {
 }
 

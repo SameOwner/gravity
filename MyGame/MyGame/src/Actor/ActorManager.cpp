@@ -78,5 +78,6 @@ unsigned int ActorManager::getSize(ActorGroup group) const
 void ActorManager::collide()
 {
 	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::POINT_ACTOR]);
+	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::CAR_ACTOR]);
 
 }
