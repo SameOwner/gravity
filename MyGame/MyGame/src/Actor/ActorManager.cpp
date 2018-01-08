@@ -16,10 +16,12 @@ void ActorManager::initialize()
 
 	actors_[ActorGroup::PLAYER_ACTOR] = std::make_shared<Actor>();
 	actors_[ActorGroup::ETCETERA_ACTOR] = std::make_shared<Actor>();
+	actors_[ActorGroup::CAR_ACTOR] = std::make_shared<Actor>();
 	actors_[ActorGroup::POINT_ACTOR] = std::make_shared<Actor>();
 	root_->clearChildren();
 	root_->addChild(actors_[ActorGroup::PLAYER_ACTOR]);
 	root_->addChild(actors_[ActorGroup::ETCETERA_ACTOR]);
+	root_->addChild(actors_[ActorGroup::CAR_ACTOR]);
 	root_->addChild(actors_[ActorGroup::POINT_ACTOR]);
 
 }

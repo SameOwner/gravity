@@ -38,7 +38,7 @@ void CameraActor::update(float deltaTime)
 
 	//“ü—Í‚ğæ‚Á‚Ä‚«‚Ä
 	Vector2 move = InputChecker::GetInstance().RightStick()*3.f;
-	if (move.Length() > 0.2f) {
+	if (move.Length() > 0.3f) {
 		rotate_ += move;
 		//ƒJƒƒ‰‚Ì‰ñ“]ŒÀŠE‚ğİ’è‚·‚é
 		rotate_.y = MathHelper::Clamp(rotate_.y, -80.0f, 80.0f);

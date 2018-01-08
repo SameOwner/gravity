@@ -3,6 +3,7 @@
 #include"../Actor/Actor.h"
 #include"../Field/FieldBase.h"
 #include"../Actor/Other/CameraActor.h"
+#include"../Input/InputChecker.h"
 
 World::World():field_(nullptr)
 {
@@ -14,6 +15,8 @@ void World::initialize()
 	uiManager_.initialize();
 	field_ = nullptr;
 	camera_.reset();
+	map_.initialize();
+	map_.getWorld(this);//テスト用
 }
 
 void World::update(float deltaTime)
@@ -27,10 +30,13 @@ void World::update(float deltaTime)
 void World::draw() const
 {
 	//fieldがいたら描画
-	if(field_!=nullptr)field_->draw();
+	if(field_!=nullptr)
+		if(InputChecker::GetInstance().KeyStateUp(InputChecker::Input_Key::X))field_->draw();
 
 	actors_.draw();
 	uiManager_.draw();
+
+	map_.draw();
 }
 
 void World::handleMessage(EventMessage message, void * param)
@@ -40,6 +46,11 @@ void World::handleMessage(EventMessage message, void * param)
 void World::addActor(ActorGroup group, const ActorPtr & actor)
 {
 	actors_.addActor(group, actor);
+}
+
+void World::loadMap(const std::string & pointfilename,const std::string& mapfilename)
+{
+	map_.load(pointfilename,mapfilename);
 }
 
 void World::addCamera(const std::shared_ptr<CameraActor> & cameraActor)
@@ -77,6 +88,11 @@ FieldPtr World::getField()
 void World::setField(FieldPtr field)
 {
 	field_ = field;
+}
+
+CityMap & World::getCityMap()
+{
+	return map_;
 }
 
 std::weak_ptr<CameraActor> World::getCamera() const

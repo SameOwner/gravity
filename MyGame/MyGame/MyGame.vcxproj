@@ -157,6 +157,8 @@
     <ClCompile Include="src\Actor\Body\BoundingSphere.cpp" />
     <ClCompile Include="src\Actor\Body\OrientedBoundingBox.cpp" />
     <ClCompile Include="src\Actor\Body\Ray.cpp" />
+    <ClCompile Include="src\Actor\Car\Car.cpp" />
+    <ClCompile Include="src\Actor\Car\PointChooser.cpp" />
     <ClCompile Include="src\Actor\Citizen\Citizen.cpp" />
     <ClCompile Include="src\Actor\Other\CameraActor.cpp" />
     <ClCompile Include="src\Actor\Other\CheckPoint.cpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="src\Camera\Camera.cpp" />
     <ClCompile Include="src\Conv\DXConverter.cpp" />
     <ClCompile Include="src\Effect\SpriteEffect\CameraWind.cpp" />
+    <ClCompile Include="src\Field\CityMap.cpp" />
     <ClCompile Include="src\Field\FieldBase.cpp" />
     <ClCompile Include="src\Field\PointGenerator.cpp" />
     <ClCompile Include="src\Game\Time.cpp" />
@@ -224,6 +227,8 @@
     <ClInclude Include="src\Actor\Body\CollisionModel.h" />
     <ClInclude Include="src\Actor\Body\OrientedBoundingBox.h" />
     <ClInclude Include="src\Actor\Body\Ray.h" />
+    <ClInclude Include="src\Actor\Car\Car.h" />
+    <ClInclude Include="src\Actor\Car\PointChooser.h" />
     <ClInclude Include="src\Actor\Citizen\Citizen.h" />
     <ClInclude Include="src\Actor\Citizen\Parts\Move\Vector3_Move.h" />
     <ClInclude Include="src\Actor\Citizen\Parts\Move\Vector3_Move_Walk.h" />
@@ -235,6 +240,7 @@
     <ClInclude Include="src\Conv\DXConverter.h" />
     <ClInclude Include="src\Define.h" />
     <ClInclude Include="src\Effect\SpriteEffect\CameraWind.h" />
+    <ClInclude Include="src\Field\CityMap.h" />
     <ClInclude Include="src\Field\FieldBase.h" />
     <ClInclude Include="src\Field\FieldPtr.h" />
     <ClInclude Include="src\Field\PointGenerator.h" />

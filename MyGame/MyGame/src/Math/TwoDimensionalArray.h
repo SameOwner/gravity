@@ -22,6 +22,19 @@ public:
 		setData(0, 0, xSize, ySize,0, dataSize, data...);
 
 	}
+	//初期化
+	void initialize(int xSize, int ySize) {
+		dataList_.clear();
+		dataList_.resize(ySize);
+		for (auto& d : dataList_) {
+			d.resize(xSize);
+		}
+
+	}
+	//データの削除
+	void clear() {
+		dataList_.clear();
+	}
 	//データの取得
 	T getElement(int x, int y) {
 		return dataList_[y][x];

@@ -8,6 +8,8 @@
 enum class ActorGroup;
 enum class EventMessage;
 class CameraActor;
+class CityMap;
+
 // ワールド抽象インターフェース
 class IWorld {
 public:
@@ -27,5 +29,5 @@ public:
 	virtual FieldPtr getField() = 0;
 	virtual void setField(FieldPtr field) = 0;
 	virtual std::weak_ptr<CameraActor> getCamera()const = 0;
-
+	virtual CityMap& getCityMap() = 0;
 };

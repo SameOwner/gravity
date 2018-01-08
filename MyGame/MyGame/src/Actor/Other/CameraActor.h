@@ -28,6 +28,7 @@ public:
 private:
 	//カメラを離す距離
 	const float defaultCameraDistance{ 30.0f };
+	//const float defaultCameraDistance{ 70.0f };//テスト
 	//補間の時間
 	float LerpTime{ 0.3f };
 
@@ -57,7 +58,7 @@ private:
 	//補正ベクトル
 	Vector3 correctPos_{ Vector3{0.0f,5.0f,0.0f} };
 
-
+	//Vector3 addVector{ 0.0f,30.0f,0.0f};//テスト
 	
 	float test;
 };

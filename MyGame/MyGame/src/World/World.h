@@ -3,6 +3,7 @@
 #include"../Field/FieldPtr.h"
 #include"../Actor/ActorManager.h"
 #include"../UI/UIManager.h"
+#include"../Field/CityMap.h"
 
 // ワールド抽象インターフェース
 class World:public IWorld {
@@ -19,6 +20,7 @@ public:
 	// アクターの追加
 	virtual void addActor(ActorGroup group, const ActorPtr& actor)override;
 
+	void loadMap(const std::string& filename, const std::string& mapfilename);
 	void addCamera(const std::shared_ptr<CameraActor> & cameraActor);
 	// アクターの検索
 	virtual ActorPtr findActor(const std::string& name)override;
@@ -32,13 +34,13 @@ public:
 	virtual FieldPtr getField()override;
 	//フィールドの設定
 	virtual void setField(FieldPtr field)override;
-
+	virtual CityMap& getCityMap()override;
 	virtual std::weak_ptr<CameraActor> getCamera()const override;
 private:
-	FieldPtr field_;
-	ActorManager actors_;
-	UIManager uiManager_;
-
-	std::weak_ptr<CameraActor> camera_;
+	FieldPtr field_{};
+	ActorManager actors_{};
+	UIManager uiManager_{};
+	CityMap map_{};
+	std::weak_ptr<CameraActor> camera_{};
 
 };

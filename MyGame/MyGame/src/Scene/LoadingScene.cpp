@@ -56,6 +56,8 @@ void LoadingScene::LoadModel()
 		defaultPath + "alicia/fly.mv1"
 	};
 	AnimLoader::getInstance().loadAnims(MODEL_ID::MODEL_PLAYER, anims);
+
+	Model::GetInstance().Load(defaultPath + "models/car/car1/model.mv1", MODEL_ID::MODEL_CAR);
 }
 
 void LoadingScene::LoadEffect()

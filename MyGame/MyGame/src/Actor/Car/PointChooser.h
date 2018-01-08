@@ -1,0 +1,18 @@
+#pragma once
+#include"../../Math/Vector3.h"
+
+class IWorld;
+class PointChooser {
+public:
+	PointChooser(IWorld* world);
+	//現在ポイントを設定
+	void setPoint(const Vector3& position);
+	//次のゴール地点を決定(ランダム)
+	void chooseGoal();
+
+	Vector3 operator ()(bool& isEnd);
+private:
+	IWorld* world_;
+	int currentPoint_;
+	int goal_;
+};

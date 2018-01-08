@@ -14,18 +14,21 @@ void GamePlayScene::start()
 {
 	world_.initialize();
 	world_.setField(std::make_shared<FieldBase>(Model::GetInstance().GetHandle(MODEL_ID::MODEL_STAGE), Model::GetInstance().GetHandle(MODEL_ID::MODEL_SKYBOX)));
+	world_.loadMap("res/Data/map.csv", "res/Data/pathmap.csv");
+	pointGenerator_.setParameter(&world_, "res/Data/point.csv");
 
 	player_ = std::make_shared<Player>(&world_, Vector3{ 0,10.0f,0 });
 	world_.addActor(ActorGroup::PLAYER_ACTOR, player_);
 
 	//auto point = std::make_shared<CheckPoint>(&world_, Vector3{ 0.0f,5.0f,10.0f });
 	//world_.addActor(ActorGroup::POINT_ACTOR , point);
+	auto car = std::make_shared<Car>(&world_, Vector3{ 0.0f,0.0f,10.0f }, MODEL_ID::MODEL_CAR);
+	world_.addActor(ActorGroup::CAR_ACTOR, car);
 
 	auto camera = std::make_shared<CameraActor>(&world_, player_->getPosition());
 	world_.addCamera(camera);
 	camera->setTarget(player_);
 
-	pointGenerator_.setParameter(&world_, "res/Data/point.csv");
 }
 
 void GamePlayScene::update(float deltaTime)
