@@ -161,7 +161,9 @@
     <ClCompile Include="src\Actor\Car\PointChooser.cpp" />
     <ClCompile Include="src\Actor\Citizen\Citizen.cpp" />
     <ClCompile Include="src\Actor\Other\CameraActor.cpp" />
+    <ClCompile Include="src\Actor\Other\CarCamera.cpp" />
     <ClCompile Include="src\Actor\Other\CheckPoint.cpp" />
+    <ClCompile Include="src\Actor\Other\Enemy.cpp" />
     <ClCompile Include="src\Actor\Player\Player.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
     <ClCompile Include="src\Conv\DXConverter.cpp" />
@@ -233,7 +235,9 @@
     <ClInclude Include="src\Actor\Citizen\Parts\Move\Vector3_Move.h" />
     <ClInclude Include="src\Actor\Citizen\Parts\Move\Vector3_Move_Walk.h" />
     <ClInclude Include="src\Actor\Other\CameraActor.h" />
+    <ClInclude Include="src\Actor\Other\CarCamera.h" />
     <ClInclude Include="src\Actor\Other\CheckPoint.h" />
+    <ClInclude Include="src\Actor\Other\Enemy.h" />
     <ClInclude Include="src\Actor\Player\Player.h" />
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Conv\ByteConverter.h" />

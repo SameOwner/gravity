@@ -2,6 +2,7 @@
 #include"Scene.h"
 #include"../Field/PointGenerator.h"
 #include"../World/World.h"
+//#include"../Actor/Other/CarCamera.h"
 
 class Player;
 //シーンテンプレート
@@ -20,4 +21,6 @@ private:
 	PointGenerator pointGenerator_;
 	World world_;
 	std::shared_ptr<Player> player_;
+	//CarCamera cc;
+
 };

@@ -9,6 +9,8 @@ public:
 	void setPoint(const Vector3& position);
 	//次のゴール地点を決定(ランダム)
 	void chooseGoal();
+	//次のゴール地点を決定(逆走無し)
+	void chooseGoal_Forward(int prevPoint);
 
 	Vector3 operator ()(bool& isEnd);
 private:

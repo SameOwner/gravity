@@ -6,7 +6,7 @@
 #include"../Define.h"
 #include"../Graphic/Sprite.h"
 
-GamePlayScene::GamePlayScene():world_(),player_(nullptr), pointGenerator_()
+GamePlayScene::GamePlayScene():world_(),player_(nullptr), pointGenerator_()/*,cc{&world_,Vector3::Zero}*/
 {
 }
 
@@ -22,8 +22,9 @@ void GamePlayScene::start()
 
 	//auto point = std::make_shared<CheckPoint>(&world_, Vector3{ 0.0f,5.0f,10.0f });
 	//world_.addActor(ActorGroup::POINT_ACTOR , point);
-	auto car = std::make_shared<Car>(&world_, Vector3{ 0.0f,0.0f,10.0f }, MODEL_ID::MODEL_CAR);
+	auto car = std::make_shared<Car>(&world_, Vector3{ 835.f,0.0f,-95.f }, MODEL_ID::MODEL_CAR);
 	world_.addActor(ActorGroup::CAR_ACTOR, car);
+	//cc.setTarget(car);
 
 	auto camera = std::make_shared<CameraActor>(&world_, player_->getPosition());
 	world_.addCamera(camera);
@@ -46,6 +47,7 @@ void GamePlayScene::update(float deltaTime)
 		isEnd_ = true;
 		next_ = SceneType::SCENE_CLEAR;
 	}
+	//cc.update(deltaTime);
 }
 
 void GamePlayScene::draw() const
