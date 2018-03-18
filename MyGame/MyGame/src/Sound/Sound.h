@@ -48,6 +48,8 @@ public:
 	/// SEを鳴らす
 	///</summary>
 	void PlaySE(const SE_ID& id, int playtype = DX_PLAYTYPE_BACK);
+	//指定音が鳴っているかのチェックを行い、鳴ってなかったら再生
+	void PlaySE_IsNotPlay(const SE_ID& id);
 	///<summary>
 	/// 同一SEが重ならないように鳴らす
 	///</summary>

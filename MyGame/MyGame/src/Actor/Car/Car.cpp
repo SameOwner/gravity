@@ -22,7 +22,7 @@ void Car::update(float deltaTime)
 	//float angle = 0.0f;//‚à‚µ‚àŠ®‘S‚É‚ ‚Á‚Ä‚½‚ç‰ñ“]‚Í–³‚µ
 	//if (checkIsLeftDot > 0.0f)angle = -1.f;//¶Œü‚«
 	//else if (checkIsLeftDot < 0.0f)angle = 1.f;//‰EŒü‚«
-	rotation_ *= Matrix::CreateFromAxisAngle(rotation_.Up(), checkIsLeftDot*5.0f);
+	rotation_ *= Matrix::CreateFromAxisAngle(rotation_.Up(), checkIsLeftDot*10.0f);
 	position_ += rotation_.Forward()*3.0f;
 	bool isEnd;
 	if (Vector2::Distance(Vector2(position_.x,position_.z), Vector2(nextPoint_.x,nextPoint_.z)) <= 10.0f) {

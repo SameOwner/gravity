@@ -77,8 +77,9 @@ void Actor::collide(Actor& other) {
 // フィールドとの衝突判定
 bool Actor::field(Vector3& result) {
 	Vector3 hitPos;
-	if (world_->getField()->getMesh().collide_line(prevPosition_ + rotation_.Up()*(body_->radius() + body_->length()*0.5f), position_ + rotation_.Up()*(body_->radius() + body_->length()*0.5f), (VECTOR*)&hitPos)) {
-		position_ -= hitPos - position_ + rotation_.Up()*(body_->length()*0.5f+body_->radius());
+	if (world_->getField()->getMesh().collide_line(prevPosition_ + rotation_.Up()*(body_->length()*0.5f), position_ + rotation_.Up()*(body_->radius() + body_->length()*0.5f), (VECTOR*)&hitPos)) {
+		Vector3 upVec = rotation_.Up()*(body_->radius() + body_->length()*0.5f);
+		position_ = hitPos - upVec;
 	}
 	Vector3 hitcenter;
 	if (world_->getField()->getMesh().collide_capsule(position_ + rotation_.Up()*(body_->length()*0.5f), position_ + rotation_.Down()*(body_->length()*0.5f), body_->radius(), (VECTOR*)&hitcenter))
@@ -96,7 +97,7 @@ bool Actor::floor(Vector3 & result)
 	if (world_->getField()->getMesh().collide_line(position_, prevPosition_, (VECTOR*)&hitpos)) {
 		position_ = hitpos+ rotation_.Up()*(body_->radius() + body_->length()*0.5f);
 	}
-	if (world_->getField()->getMesh().collide_line(position_, position_ + rotation_.Down()*(body_->radius()+body_->length()*0.5f +0.5f), (VECTOR*)&hitpos)) {
+	if (world_->getField()->getMesh().collide_line(position_, position_ + rotation_.Down()*(body_->radius()+body_->length()*0.5f +2.f), (VECTOR*)&hitpos)) {
 		result = hitpos;
 		return true;
 	}

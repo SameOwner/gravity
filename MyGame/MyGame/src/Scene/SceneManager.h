@@ -8,7 +8,6 @@ class Scene;
 class SceneManager {
 public:
 	SceneManager();
-	~SceneManager();
 	void start();
 	void update(float deltaTime);
 	void draw();

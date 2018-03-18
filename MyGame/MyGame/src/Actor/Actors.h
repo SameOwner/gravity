@@ -3,4 +3,5 @@
 #include"../Actor/Other/CheckPoint.h"
 #include"../Actor/Player/Player.h"
 #include"../Actor/Car/Car.h"
+#include"../Actor/Citizen/Citizen.h"
 

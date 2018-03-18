@@ -15,8 +15,6 @@ DualShock4コントローラの傾きを(大まかに)取得するためのクラス
 注2)複数個のDualShock4コントローラが接続される場合については考慮していない
 */
 class DualShock4Manager {
-	friend class TitleScene;
-
 private:
 	DualShock4Manager();
 	~DualShock4Manager();

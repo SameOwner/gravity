@@ -3,6 +3,8 @@
 #include"../Actor/Other/CheckPoint.h"
 #include"../Graphic/DebugDraw.h"
 #include"../Define.h"
+#include"../Actor/Other/Enemy.h"
+#include"../Graphic/FontManager.h"
 
 PointGenerator::PointGenerator():world_(nullptr),reader_()
 {
@@ -23,8 +25,9 @@ void PointGenerator::setParameter(IWorld * world, const std::string & filename)
 	world_ = world;
 	reader_.load(filename);
 
-	//生成
-	generate();
+	for (int i = 0; i < reader_.rows();i++) {//生成
+		generate();
+	}
 }
 
 PointGenerator::~PointGenerator()
@@ -34,20 +37,22 @@ PointGenerator::~PointGenerator()
 
 void PointGenerator::update(float deltaTime)
 {
-	if (world_ == nullptr)return;//ワールドを持ってなかったら生成しない
+	//if (world_ == nullptr)return;//ワールドを持ってなかったら生成しない
 
-	if (isEnd_)return;//全部出し終わってたらもう生成しない
+	//if (isEnd_)return;//全部出し終わってたらもう生成しない
 	
-	//ポイントがいなくなってたら、次のポイントを生成する
+	//ポイントがいなくなってたら、ゲームクリア
 	if (world_->getActorCount(ActorGroup::POINT_ACTOR) == 0) {
-		generate();
+		isEnd_ = true;
+	//	generate();
 	}
 }
 
 void PointGenerator::draw() const
 {
-	int t = reader_.rows() - pointCount_ + 1;
-	DebugDraw::DebugDrawFormatString(WINDOW_WIDTH / 2, 0, GetColor(255, 255, 255), "%d",t);
+	//int t = reader_.rows() - pointCount_ + 1;
+	int t = world_->getActorCount(ActorGroup::POINT_ACTOR);
+	FontManager::GetInstance().DrawTextApplyFont(WINDOW_WIDTH / 2, 0, GetColor(255, 255, 255), FONT_ID::FONT_COUNT, "%d", t);
 }
 
 bool PointGenerator::isEnd() const
@@ -68,7 +73,7 @@ void PointGenerator::generate()
 	position.y = reader_.getf(pointCount_, 1);
 	position.z = reader_.getf(pointCount_, 2);
 
-	world_->addActor(ActorGroup::POINT_ACTOR, std::make_shared<CheckPoint>(world_, position));
+	world_->addActor(ActorGroup::POINT_ACTOR, std::make_shared<Enemy>(world_, position));
 
 	pointCount_++;
 }

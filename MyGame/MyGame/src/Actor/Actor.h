@@ -29,7 +29,7 @@ public:
 	virtual bool isCollide(const Actor& other);
 	virtual void onCollide(Actor& other);
 	//メッセージの受信
-	virtual void receiveMessage(EventMessage message, void* param);
+	virtual void receiveMessage(EventMessage message, void* param=nullptr);
 
 	// 衝突処理
 	void collide(Actor& other);

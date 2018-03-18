@@ -1,6 +1,6 @@
 #pragma once
 #include"../Actor.h"
-#include"../../Graphic/AnimationOutSide.h"
+#include"../../Graphic/AnimationDx.h"
 #include"../Body/BoundingCapsule.h"
 #include"../../Effect/SpriteEffect/CameraWind.h"
 #include"../../Method/CountTimer.h"
@@ -23,6 +23,7 @@ public:
 		Blow,//吹き飛ばし
 		Down,//転ぶ
 		GetUp,//起き上がり
+		OutOfField,//フィールド外
 	};
 	enum class Player_Animation {
 		Idle=0,
@@ -55,7 +56,8 @@ public:
 	void aerialVelocityKeep();
 	void floatVelocityKeep();
 
-	void hit(const Vector3& direction);
+	//接触時処理(forceHitが)
+	void hit(const Vector3& direction, bool forceHit = false);
 
 	//メッセージの受信
 	virtual void receiveMessage(EventMessage message, void* param) override;
@@ -75,6 +77,10 @@ private:
 	//重力値(重力変化時)の加算
 	void addFloatGravity();
 
+	//入力を移動へ
+	void input_to_move(float deltaTime);
+	//ダウン可能状態か
+	bool isCanDown()const;
 //状態関数
 private:
 	//待機
@@ -146,14 +152,27 @@ private:
 	void update_GetUp(float deltaTime);
 	void end_GetUp();
 
+	//フィールド外
+	void to_OutOfField();
+	void update_OutOfField(float deltaTime);
+	void end_OutOfField();
+	
+
 	//浮遊ゲージ減少(0以下になったらfalseを返す)
-	bool subFloatPower();
+	bool subFloatPower(float rate = 1.0f);
 private:
 	//最大浮遊ゲージ値
 	const float MaxFloatPower{ 100.0f };
 	//基本的なvelocityの乗算割合
 	const float DefVelocityMult{ 0.8f };
-	AnimationOutSide animation_;
+
+	float invisibleTime_{ 0.0f };
+	const std::list<Player_State> CantDownState_{
+		Player_State::Blow,
+		Player_State::Down,
+		Player_State::GetUp
+	};//ダウン不可能状態リスト
+	AnimationDx animation_;
 	//自身の状態
 	Player_State state_;
 	//重力倍率

@@ -88,7 +88,9 @@ BoundingSphere BoundingSphere::transform_e(const Matrix & mat) const {
 
 // ê}å`ï`âÊ
 void BoundingSphere::draw() const{
+#ifdef _DEBUG
 	DrawSphere3D(mPosition, mRadius, 32, GetColor(255, 0, 0), GetColor(125, 125, 125), FALSE);
+#endif // _DEBUG
 }
 
 void BoundingSphere::draw(const Vector3 & position) const

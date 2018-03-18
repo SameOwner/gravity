@@ -162,7 +162,7 @@ Vector2 GamePad::RightStick(int pad)
 {
 	int stickX, stickY;
 	GetJoypadAnalogInputRight(&stickX, &stickY, pad);
-	return Vector2((float)stickX / 1000.0f, (float)stickY / 1000.0f);
+	return Vector2((float)stickX / 1000.0f, (float)-stickY / 1000.0f);
 }
 
 // 指定のパッドのアナログスティックの入力具合を調べる
@@ -171,7 +171,7 @@ Vector2 GamePad::Stick(int pad)
 {
 	int stickX, stickY;
 	GetJoypadAnalogInput(&stickX, &stickY, pad);
-	return Vector2((float)stickX / 1000.0f, (float)stickY / 1000.0f);
+	return Vector2((float)stickX / 1000.0f, (float)-stickY / 1000.0f);
 }
 
 Vector2 GamePad::GetCurrentStick()
@@ -237,11 +237,11 @@ void GamePad::Update()
 	prevStick_ = curStick_;
 	int stickX, stickY;
 	GetJoypadAnalogInput(&stickX, &stickY, 1);
-	curStick_ = Vector2((float)stickX / 1000.0f, (float)stickY / 1000.0f);
+	curStick_ = Vector2((float)stickX / 1000.0f, (float)-stickY / 1000.0f);
 
 	prevRightStick_ = curRightStick_;
 	GetJoypadAnalogInputRight(&stickX, &stickY, 1);
-	curRightStick_ = Vector2((float)stickX / 1000.0f, (float)stickY / 1000.0f);
+	curRightStick_ = Vector2((float)stickX / 1000.0f, (float)-stickY / 1000.0f);
 
 }
 

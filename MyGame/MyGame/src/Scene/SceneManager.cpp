@@ -11,11 +11,6 @@ SceneManager::SceneManager() :currentScene_(SceneType::SCENE_LOADING) {
 	scenes_[SceneType::SCENE_GAMEOVER] = std::make_shared<GameOverScene>();
 }
 
-SceneManager::~SceneManager() {
-	scenes_.clear();
-}
-
-
 void SceneManager::start() {
 	scenes_[currentScene_]->start();
 }

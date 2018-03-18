@@ -104,6 +104,13 @@ void Sound::PlaySE(const SE_ID& id, int playtype)
 	PlaySoundMem(m_SEs[id], playtype);
 }
 
+void Sound::PlaySE_IsNotPlay(const SE_ID & id)
+{
+	if (IsPlaySE(id))return;
+
+	PlaySE(id);
+}
+
 void Sound::PlaySEDuplicate(const SE_ID& id, int playtype)
 {
 	if (IsPlaySE(id) && playtype == DX_PLAYTYPE_LOOP)

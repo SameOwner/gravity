@@ -35,12 +35,12 @@ float Random::Range(float min, float max)
 	return rand(m_mt);
 }
 
-// 実数型の乱数を生成する（起点値、分散値）
-float Random::Point(float point, float variance)
-{
-	// pointを中心にvarianceの値で分散された範囲設定
-	std::normal_distribution<float> rand(point, variance);
-
-	// 範囲内で乱数を生成し、返す
-	return rand(m_mt);
-}
+//// 実数型の乱数を生成する（起点値、分散値）
+//float Random::Point(float point, float variance)
+//{
+//	// pointを中心にvarianceの値で分散された範囲設定
+//	std::normal_distribution<float> rand(point, variance);
+//
+//	// 範囲内で乱数を生成し、返す
+//	return rand(m_mt);
+//}

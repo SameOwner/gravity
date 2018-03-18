@@ -1,6 +1,6 @@
 #pragma once
 #include"Keyboard.h"
-#include"DualShock4Input.h"
+#include"GamePad.h"
 #include"../Math/Vector2.h"
 #include<map>
 
@@ -64,7 +64,7 @@ public:
 
 	void Update();
 private:
-	using Connect_Key_Pad = std::pair<UINT, std::pair<int, int>>;
+	using Connect_Key_Pad = std::pair<UINT, UINT>;
 	std::map<Input_Key, Connect_Key_Pad> inputList_;
 
 };

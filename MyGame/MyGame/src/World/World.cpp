@@ -17,6 +17,9 @@ void World::initialize()
 	camera_.reset();
 	map_.initialize();
 	map_.getWorld(this);//テスト用
+	walkMap_.initialize();
+	fade_.init();
+
 }
 
 void World::update(float deltaTime)
@@ -24,19 +27,21 @@ void World::update(float deltaTime)
 	if (field_ != nullptr)field_->update(deltaTime);
 	actors_.update(deltaTime);
 	uiManager_.update(deltaTime);
-
+	fade_.update(deltaTime);
 }
 
 void World::draw() const
 {
 	//fieldがいたら描画
 	if(field_!=nullptr)
-		if(InputChecker::GetInstance().KeyStateUp(InputChecker::Input_Key::X))field_->draw();
+		field_->draw();
 
 	actors_.draw();
 	uiManager_.draw();
 
 	map_.draw();
+
+	fade_.draw();
 }
 
 void World::handleMessage(EventMessage message, void * param)
@@ -48,9 +53,19 @@ void World::addActor(ActorGroup group, const ActorPtr & actor)
 	actors_.addActor(group, actor);
 }
 
+void World::addUI(const UIPtr & ui)
+{
+	uiManager_.add(ui);
+}
+
 void World::loadMap(const std::string & pointfilename,const std::string& mapfilename)
 {
 	map_.load(pointfilename,mapfilename);
+}
+
+void World::addWalkPoint(const std::string & pointfilename, const std::string & mapfilename)
+{
+	walkMap_.load(pointfilename, mapfilename);
 }
 
 void World::addCamera(const std::shared_ptr<CameraActor> & cameraActor)
@@ -65,9 +80,9 @@ ActorPtr World::findActor(const std::string & name)
 	return actors_.findActor(name);
 }
 
-void World::findActors(const std::string & name, std::list<ActorPtr>& actorList)
+void World::findActors(ActorGroup group,const std::string & name, std::list<std::weak_ptr<Actor>>& actorList)
 {
-
+	actors_.findActor(group,name, actorList);
 }
 
 int World::getActorCount(ActorGroup group) const
@@ -93,6 +108,16 @@ void World::setField(FieldPtr field)
 CityMap & World::getCityMap()
 {
 	return map_;
+}
+
+WalkGraph & World::getWalkMap()
+{
+	return walkMap_;
+}
+
+FadeSprite & World::getFade()
+{
+	return fade_;
 }
 
 std::weak_ptr<CameraActor> World::getCamera() const

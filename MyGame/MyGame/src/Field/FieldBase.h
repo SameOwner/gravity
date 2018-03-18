@@ -1,5 +1,6 @@
 #pragma once
 #include"../Math/Collision/CollisionMesh.h"
+#include"FieldOut.h"
 
 // フィールドクラス
 class FieldBase {
@@ -13,6 +14,7 @@ public:
 	// フィールドのハンドル取得
 	int modelHandle();
 	CollisionMesh& getMesh();
+	CollisionMesh& getOutMesh();
 	// コピー禁止
 	FieldBase(const FieldBase& other) = delete;
 	FieldBase& operator = (const FieldBase& other) = delete;
@@ -20,4 +22,5 @@ private:
 	int field_;
 	int skyBox_;
 	CollisionMesh mesh_;
+	FieldOut out_;
 };

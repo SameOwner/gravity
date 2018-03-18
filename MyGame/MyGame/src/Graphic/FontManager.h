@@ -21,10 +21,19 @@ public:
 	int GetFontSize(FONT_ID id)const;
 
 	//フォントを利用した文字列描画
-	void DrawTextApplyFont(int x,int y,unsigned int color,FONT_ID id,const std::string& text,...);
+	template<class ...T>
+	void DrawTextApplyFont(int x,int y,unsigned int color,FONT_ID id,const std::string& text, T ...args);
 
 	void End();
 private:
 	std::map<FONT_ID, int> fontids_;
 	std::map<FONT_ID, int> fontSizes_;
 };
+
+template<class ...T>
+void FontManager::DrawTextApplyFont(int x, int y, unsigned int color, FONT_ID id, const std::string & text, T ...args)
+{
+	DrawFormatStringToHandle(x, y, color, fontids_[id], text.c_str(), args...);
+
+	
+}

@@ -8,12 +8,14 @@
 #include"../../ID/EnumIDs.h"
 #include"../../Define.h"
 #include"../Other/CameraActor.h"
+#include"../../Fade/FadeSprite.h"
+#include"../../Sound/Sound.h"
 
 Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
-	Actor(world,"Player",position,body),animation_(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER)),
+	Actor(world,"Player",position,body),animation_(),
 	floatPower_(MaxFloatPower), wind_()
 {
-	//animation_.ChangeAnim()
+	animation_.SetHandle(Model::GetInstance().GetHandle(MODEL_ID::MODEL_PLAYER));
 	playerUpdateFunc_[Player_State::Idle] = [this](float deltaTime) {update_Idle(deltaTime); };
 	playerToNextModeFunc_[Player_State::Idle]= [this]() {to_Idle(); };
 	playerEndModeFunc_[Player_State::Idle]= [this]() {end_Idle(); };
@@ -66,6 +68,10 @@ Player::Player(IWorld* world, const Vector3& position, const IBodyPtr& body):
 	playerToNextModeFunc_[Player_State::GetUp] = [this]() {to_GetUp(); };
 	playerEndModeFunc_[Player_State::GetUp] = [this]() {end_GetUp(); };
 
+	playerUpdateFunc_[Player_State::OutOfField] = [this](float deltaTime) {update_OutOfField(deltaTime); };
+	playerToNextModeFunc_[Player_State::OutOfField] = [this]() {to_OutOfField(); };
+	playerEndModeFunc_[Player_State::OutOfField] = [this]() {end_OutOfField(); };
+
 }
 
 void Player::initialize()
@@ -80,7 +86,7 @@ void Player::update(float deltaTime)
 {
 	playerUpdateFunc_[state_](deltaTime);
 
-	animation_.update(MathHelper::Sign(deltaTime)*0.5f);
+	animation_.Update(MathHelper::Sign(deltaTime)*0.5f);
 
 	position_ += velocity_;
 	velocity_ *= velocityMultPower;
@@ -97,6 +103,12 @@ void Player::update(float deltaTime)
 		position_ = result+rotation_.Up()*(body_->length()*0.5f+body_->radius());
 	}
 	else prevfloor_ = false;
+
+	if (state_ == Player_State::OutOfField)return;//既に範囲外状態なら範囲外検索はしない
+	Vector3 hitcenter;
+	if (world_->getField()->getOutMesh().collide_capsule(position_ + rotation_.Up()*(body_->length()*0.5f), position_ + rotation_.Down()*(body_->length()*0.5f), body_->radius(), (VECTOR*)&hitcenter)) {
+		change_State(Player_State::OutOfField);
+	}
 }
 
 void Player::draw() const
@@ -111,34 +123,34 @@ void Player::draw() const
 
 	DebugDraw::DebugDrawFormatString(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, GetColor(255, 255, 255), "%f:%f:%f", position_.x, position_.y, position_.z);
 
-	DrawCircleGauge(100, 100, floatPower_, Sprite::GetInstance().GetHandle(SPRITE_ID::SPRITE_FLOATGAUGE));
-	//Vector3 hitPos;
-	//Vector3 hitNormal;
-	//if (world_->getField()->getMesh().collide_line(position_, position_ + flyDirection_*100.0f, (VECTOR*)&hitPos, (VECTOR*)&hitNormal)) {
-	//	DrawLine3D(hitPos, hitPos + (hitNormal*10.0f), GetColor(255, 0, 0));
-	//}
-
+	Vector2 gaugeDrawPos{ 100.0f,100.0f };
+	Sprite::GetInstance().Draw(SPRITE_ID::SPRITE_FLOATGAUGE_FRAME, gaugeDrawPos, Vector2(Sprite::GetInstance().GetSize(SPRITE_ID::SPRITE_FLOATGAUGE_FRAME))*0.5f, Vector2::One);
+	SetDrawBright(220, 0, 140);
+	DrawCircleGauge(gaugeDrawPos.x, gaugeDrawPos.y, floatPower_, Sprite::GetInstance().GetHandle(SPRITE_ID::SPRITE_FLOATGAUGE));
+	SetDrawBright(255, 255, 255);
+	DebugDraw::DebugDrawFormatString(200, 300, GetColor(255, 255, 255), "%f,%f,%f", position_.x, position_.y, position_.z);
 }
 
 void Player::aerialVelocityKeep()
 {
-	velocity_.x *= 2.3f - MathHelper::Clamp(std::abs(velocity_.x), 1.0f, 1.05f);
-	velocity_.z *= 2.3f - MathHelper::Clamp(std::abs(velocity_.z), 1.0f, 1.05f);
-	//velocityMultPower = 1.0f;
+	velocityMultPower = 0.95f;
 
 
 }
 
 void Player::floatVelocityKeep()
 {
-	//velocity_ *= 1.2f;
-	velocityMultPower = 1.0f;
 }
 
-void Player::hit(const Vector3& direction)
+void Player::hit(const Vector3& direction,bool forceHit)
 {
 	blowDirection_ = Vector3(direction).Normalize();
-	blowDirection_ += Vector3::Up*0.2f;//一応打ち上げる
+	if (forceHit)velocity_ += blowDirection_;//強制ヒットなら押し出し
+
+	if (!isCanDown())return;//ヒット条件を満たしてなければ
+	
+	blowDirection_ += Vector3::Up*0.2f;//吹っ飛ばし移行時は少し打ち上げる
+
 	change_State_and_Anim(Player_State::Blow, Player_Animation::Blow, 0.0f, 1.0f, false);
 
 }
@@ -148,6 +160,8 @@ void Player::receiveMessage(EventMessage message, void * param)
 	switch (message)
 	{
 	case EventMessage::Hit_Car:
+		hit(*(Vector3*)param,true);
+	case EventMessage::Hit_Bullet:
 		hit(*(Vector3*)param);
 		break;
 	default:
@@ -183,22 +197,44 @@ bool Player::change_State(Player_State state)
 }
 
 void Player::change_Animation(Player_Animation animID,float animFrame,float animSpeed, bool isLoop,float blendRate) {
-	animation_.changeAnimation(AnimLoader::getInstance().getAnimKey(MODEL_ID::MODEL_PLAYER,(int)animID), isLoop, animSpeed,blendRate, animFrame);
+	//animation_.changeAnimation(AnimLoader::getInstance().getAnimKey(MODEL_ID::MODEL_PLAYER,(int)animID), isLoop, animSpeed,blendRate, animFrame);
+	animation_.ChangeAnim((int)animID, animFrame, animSpeed, isLoop, blendRate);
 }
 
 void Player::addGravity()
 {
-	gravity_ += 0.1f;
-	gravity_ = min(gravity_, 10.0f);//重力最大値
+	gravity_ += 0.02f;
+	gravity_ = min(gravity_, 1.5f);//重力最大値
 	velocity_ += Vector3::Down*gravity_;
 
 }
 
 void Player::addFloatGravity()
 {
-	gravity_ += 0.05f;
-	gravity_ = min(gravity_, 10.0f);//重力最大値
-	velocity_ += -world_->getCamera().lock()->getUpVector()*gravity_;
+	gravity_ += 0.01f;
+	gravity_ = min(gravity_, 1.0f);//重力最大値
+	velocity_ += -world_->getCamera().lock()->getUpVector().Normalize()*gravity_;
+}
+
+void Player::input_to_move(float deltaTime)
+{
+	Vector2 velocity = InputChecker::GetInstance().Stick();
+	if (velocity.Length() <= 0.2f) { return; }
+
+	Vector3 frameVelocity = Vector3::Zero;
+	if (!world_->getCamera().expired()) {
+		frameVelocity = world_->getCamera().lock()->getMoveForwardPos()*velocity.y*10.0f;//前方向への移動量
+		frameVelocity += world_->getCamera().lock()->getMoveRightPos()*velocity.x*10.0f;
+	}
+	frameVelocity *= deltaTime;
+
+	velocity_ += frameVelocity;
+
+}
+
+bool Player::isCanDown() const
+{
+	return (std::find(CantDownState_.begin(), CantDownState_.end(), state_)== CantDownState_.end());//ダウン不可能状態に一致しないか	
 }
 
 
@@ -238,9 +274,12 @@ void Player::update_Idle(float deltaTime)
 	Vector2 velocity = InputChecker::GetInstance().Stick();
 	if (velocity.Length() <= 0.2f) {
 		change_Animation(Player_Animation::Idle);
+		Sound::GetInstance().StopSE(SE_ID::RUN_SE);
+
 		return;
 	}
 	change_Animation(Player_Animation::Run);
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::RUN_SE);
 
 	Vector3 frameVelocity = Vector3::Zero;
 	if (!world_->getCamera().expired()) {
@@ -256,6 +295,8 @@ void Player::update_Idle(float deltaTime)
 
 void Player::end_Idle()
 {
+	Sound::GetInstance().StopSE(SE_ID::RUN_SE);
+
 }
 
 void Player::to_Move()
@@ -278,6 +319,8 @@ void Player::to_Slide()
 
 void Player::update_Slide(float deltaTime)
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::WIND_SE);
+
 	wind_.update(deltaTime);
 
 	if (!subFloatPower()) {
@@ -341,11 +384,15 @@ void Player::end_Slide()
 {
 	wind_.stop();
 	world_->getCamera().lock()->outCamera();
+	Sound::GetInstance().StopSE(SE_ID::WIND_SE);
+
 }
 
 void Player::to_Jump()
 {
 	velocity_ += rotation_.Up()*10.0f;
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::JUMP_SE);
+
 }
 
 void Player::update_Jump(float deltaTime)
@@ -368,16 +415,20 @@ void Player::update_Jump(float deltaTime)
 		return;
 	}
 
-
+	input_to_move(deltaTime);
 }
 
 void Player::end_Jump()
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::LAND_SE);
+
 }
 
 void Player::to_SlideJump()
 {
-	velocity_ += rotation_.Up()*10.0f;
+	velocity_ += rotation_.Up()*20.0f;
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::JUMP_SE);
+
 }
 
 void Player::update_SlideJump(float)
@@ -404,6 +455,8 @@ void Player::update_SlideJump(float)
 
 void Player::end_SlideJump()
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::LAND_SE);
+
 }
 
 void Player::to_Float()
@@ -421,11 +474,11 @@ void Player::update_Float(float deltaTime)
 	}
 
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Fly, Player_Animation::Fly));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Fly, Player_Animation::Fly);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
-		if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
 		return;
 	}
 
@@ -445,6 +498,8 @@ void Player::to_Fly()
 
 void Player::update_Fly(float deltaTime)
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::WIND_SE);
+
 	if (!subFloatPower()) {
 		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
 		return;
@@ -458,16 +513,16 @@ void Player::update_Fly(float deltaTime)
 		rotation_.NormalizeRotationMatrix_BaseUp();
 		if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
 		position_ = hitPos + rotation_.Up()*(body_->radius()+body_->length()*0.5f);
-		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle);
 		return;
 	}
 
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Float, Player_Animation::Float);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
-		if (change_State_and_Anim(Player_State::Fall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
 		return;
 	}
 	
@@ -489,10 +544,13 @@ void Player::update_Fly(float deltaTime)
 
 void Player::end_Fly()
 {
+	Sound::GetInstance().StopSE(SE_ID::WIND_SE);
+
 }
 
 void Player::to_WallRun()
 {
+
 }
 
 void Player::update_WallRun(float deltaTime)
@@ -503,15 +561,15 @@ void Player::update_WallRun(float deltaTime)
 	}
 
 	if (!prevfloor_) {
-		if (change_State_and_Anim(Player_State::FloatFall, Player_Animation::Fall));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::FloatFall, Player_Animation::Fall);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::B)) {
-		if (change_State_and_Anim(Player_State::FloatJump, Player_Animation::Jump));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::FloatJump, Player_Animation::Jump);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Float, Player_Animation::Float);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
@@ -523,8 +581,12 @@ void Player::update_WallRun(float deltaTime)
 	Vector2 velocity = InputChecker::GetInstance().Stick();
 	if (velocity.Length() <= 0.2f) {
 		change_Animation(Player_Animation::Idle);
+		Sound::GetInstance().StopSE(SE_ID::RUN_SE);
+
 		return;
 	}
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::RUN_SE);
+
 	change_Animation(Player_Animation::WallRun);
 	Vector3 frameVelocity = Vector3::Zero;
 	if (!world_->getCamera().expired()) {
@@ -553,11 +615,14 @@ void Player::update_WallRun(float deltaTime)
 
 void Player::end_WallRun()
 {
+	Sound::GetInstance().StopSE(SE_ID::RUN_SE);
+
 }
 
 void Player::to_FloatJump()
 {
 	velocity_ += rotation_.Up()*10.0f;
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::JUMP_SE);
 
 }
 
@@ -569,6 +634,7 @@ void Player::update_FloatJump(float deltaTime)
 	}
 
 	addFloatGravity();
+	aerialVelocityKeep();
 
 	//足場についてたら待機に戻る
 	if (prevfloor_) {
@@ -579,11 +645,11 @@ void Player::update_FloatJump(float deltaTime)
 	
 	//落下が始まったらFallに移行
 	if (Vector3::Dot(velocity_, world_->getCamera().lock()->getUpVector()) <= 0.0f) {
-		if (change_State_and_Anim(Player_State::FloatFall, Player_Animation::FloatFall));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::FloatFall, Player_Animation::FloatFall);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Float, Player_Animation::Float);
 		return;
 	}
 
@@ -603,6 +669,8 @@ void Player::update_FloatJump(float deltaTime)
 
 void Player::end_FloatJump()
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::LAND_SE);
+
 }
 
 void Player::to_FloatFall()
@@ -611,17 +679,19 @@ void Player::to_FloatFall()
 
 void Player::update_FloatFall(float deltaTime)
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::WIND_SE);
+
 	if (!subFloatPower()) {
 		change_State_and_Anim(Player_State::Fall, Player_Animation::Fall);
 		return;
 	}
 
 	if (prevfloor_) {
-		if (change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::WallRun, Player_Animation::Idle);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Float, Player_Animation::Float);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::L1)) {
@@ -630,12 +700,14 @@ void Player::update_FloatFall(float deltaTime)
 	}
 
 	addFloatGravity();
-	floatVelocityKeep();
+	aerialVelocityKeep();
 
 }
 
 void Player::end_FloatFall()
 {
+	Sound::GetInstance().StopSE(SE_ID::WIND_SE);
+
 }
 
 void Player::to_Fall()
@@ -647,22 +719,28 @@ void Player::to_Fall()
 
 void Player::update_Fall(float deltaTime)
 {
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::WIND_SE);
+
 	if (prevfloor_) {
-		if (change_State_and_Anim(Player_State::Idle, Player_Animation::Idle));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Idle, Player_Animation::Idle);
 		return;
 	}
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::R1)) {
-		if (change_State_and_Anim(Player_State::Float, Player_Animation::Float));// playerUpdateFunc_[state_](deltaTime);
+		change_State_and_Anim(Player_State::Float, Player_Animation::Float);
 		return;
 	}
 
 	addGravity();
 
 	aerialVelocityKeep();
+
+	input_to_move(deltaTime);
 }
 
 void Player::end_Fall()
 {
+	Sound::GetInstance().StopSE(SE_ID::WIND_SE);
+
 }
 
 void Player::to_Blow()
@@ -671,6 +749,8 @@ void Player::to_Blow()
 	rotation_ = rotation_.NormalizeRotationMatrix_BaseUp();
 	if (!world_->getCamera().expired())world_->getCamera().lock()->setUpVector(rotation_.Up());
 	downTimer_.set(10);//10フレームは接地判定をしない
+
+	Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::HIT_SE);
 }
 
 void Player::update_Blow(float deltaTime)
@@ -681,6 +761,7 @@ void Player::update_Blow(float deltaTime)
 	}
 	addGravity();
 	velocity_ += blowDirection_;
+	blowDirection_ = blowDirection_*0.98f;
 
 }
 
@@ -713,7 +794,7 @@ void Player::to_GetUp()
 
 void Player::update_GetUp(float deltaTime)
 {
-	if (animation_.isEnd()) {
+	if (animation_.IsAnimEnd()) {
 		change_State_and_Anim(Player_State::Idle, Player_Animation::Idle);// playerUpdateFunc_[state_](deltaTime);
 		return;
 	}
@@ -724,9 +805,29 @@ void Player::end_GetUp()
 {
 }
 
-bool Player::subFloatPower()
+void Player::to_OutOfField()
 {
-	floatPower_ -= 0.1f;
+	
+	world_->getFade().addCallBack([&] {
+		position_ = Vector3{ 0,10.0f,0 };
+		change_State_and_Anim(Player_State::Idle, Player_Animation::Idle); 
+	});
+	world_->getFade().start();
+}
+
+void Player::update_OutOfField(float deltaTime)
+{
+	if (world_->getFade().isActive())return;
+
+}
+
+void Player::end_OutOfField()
+{
+}
+
+bool Player::subFloatPower(float rate)
+{
+	floatPower_ -= 0.1f*rate;
 	floatPower_ = MathHelper::Clamp(floatPower_, 0.0f, MaxFloatPower);
 	return floatPower_ > 0.0f;
 }

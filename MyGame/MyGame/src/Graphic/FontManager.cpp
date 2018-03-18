@@ -34,13 +34,6 @@ int FontManager::GetFontSize(FONT_ID id) const
 	return fontSizes_.at(id);
 }
 
-void FontManager::DrawTextApplyFont(int x, int y, unsigned int color, FONT_ID id, const std::string & text,...)
-{
-	DrawFormatStringToHandle(x, y, color, fontids_[id], text.c_str());
-
-
-}
-
 void FontManager::End()
 {
 	InitFontToHandle();

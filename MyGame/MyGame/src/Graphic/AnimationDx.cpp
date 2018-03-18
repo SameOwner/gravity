@@ -8,10 +8,7 @@
 
 AnimationDx::~AnimationDx()
 {
-	// 前アニメーションをデタッチ
-	MV1DetachAnim(modelHandle_, anim_);
-	MV1DetachAnim(modelHandle_, prevAnim_);
-	MV1DeleteModel(modelHandle_);
+	clearModel();
 }
 
 void AnimationDx::Update(const float frameTime)
@@ -38,9 +35,13 @@ void AnimationDx::Update(const float frameTime)
 	prevAnim_ = MV1AttachAnim(modelHandle_, prevMotion_);
 	// 前アニメーション更新
 	float prevMaxAnimTime = MV1GetAttachAnimTotalTime(modelHandle_, prevAnim_);
-	prevAnimTimer_ += frameTime*animSpeed_;
-	prevAnimTimer_ = fmodf(prevAnimTimer_, prevMaxAnimTime);
-
+	if (prevLoop_) {
+		prevAnimTimer_ += frameTime*animSpeed_;
+		prevAnimTimer_ = fmodf(prevAnimTimer_, prevMaxAnimTime);
+	}
+	else {
+		prevAnimTimer_ = prevMaxAnimTime;
+	}
 	// ブレンド率の更新
 	rate_ += RATE_TIME;
 	rate_ = MathHelper::Clamp(rate_, 0.0f, 1.0f);
@@ -58,16 +59,19 @@ void AnimationDx::Draw(const Matrix& rotation) const
 	Model::GetInstance().Draw(modelHandle_, rotation);
 }
 
-void AnimationDx::ChangeAnim(const int motion, const float frame, float animSpeed, bool isLoop)
+void AnimationDx::ChangeAnim(const int motion, const float frame, float animSpeed, bool isLoop, float blend, bool forceChange)
 {
-	// 現在と同じモーションの場合は何もしない
-	if (motion_ == motion) return;
-
+	//強制変更ではなく
+	if (!forceChange) {
+		// 現在と同じモーションの場合は何もしない
+		if (motion_ == motion) return;
+	}
 	prevMotion_ = motion_;
 	motion_ = motion;
 	prevAnimTimer_ = animTimer_;
 	animTimer_ = frame;
-	rate_ = 0.0f;
+	rate_ = 1.0f - blend;
+	isAnimEnd_ = false;
 
 	// 前アニメーションをデタッチ
 	MV1DetachAnim(modelHandle_, anim_);
@@ -80,12 +84,15 @@ void AnimationDx::ChangeAnim(const int motion, const float frame, float animSpee
 
 	maxAnimTime_ = MV1GetAttachAnimTotalTime(modelHandle_, anim_);
 
+	//ループ情報を保存して次のループを設定する
+	prevLoop_ = isLoop_;
 	isLoop_ = isLoop;
 	animSpeed_ = animSpeed;
 }
 
 void AnimationDx::SetHandle(const int & handle)
 {
+	if (modelHandle_ != -1)clearModel();
 	modelHandle_ = MV1DuplicateModel(handle);
 }
 
@@ -114,12 +121,17 @@ float AnimationDx::GetAnimMaxTime(int index) const
 	return MV1GetAnimTotalTime(modelHandle_, index) / 60.0f;
 }
 
-void AnimationDx::blendAnim(int anim1, int anim2, float blendRate)
+int AnimationDx::getModelHandle() const
 {
-	prevAnim_ = anim2;
-	anim_ = anim1;
-	rate_ = blendRate;
-
+	return modelHandle_;
+}
+void AnimationDx::lastAnim() {
+	animTimer_ = maxAnimTime_;
+	rate_ = 1.0f;
+}
+void AnimationDx::clearModel()
+{
+	MV1DeleteModel(modelHandle_);
 }
 
 

@@ -33,7 +33,7 @@ public:
 	///<summary>
 	/// 起点値の乱数を生成する（起点値、分散値）
 	///</summary>
-	float Point(float point, float variance);
+	//float Point(float point, float variance);
 
 	template <class T>
 	T Randomize(const std::vector<T>& list);

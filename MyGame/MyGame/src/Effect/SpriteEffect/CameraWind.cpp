@@ -40,7 +40,7 @@ void CameraWind::update(float deltaTime)
 	for (auto& w : windPoints_) {
 		std::get<1>(w) += deltaTime*4.0f;
 	}
-	windPoints_.remove_if([](std::tuple<Vector2, float,int,float>& pr) {return std::get<1>(pr) >= 1.0f; });
+	windPoints_.remove_if([](std::tuple<Vector2, float,float,float>& pr) {return std::get<1>(pr) >= 1.0f; });
 
 	int createCount = WindSize - windPoints_.size();
 	for (int i = 0; i < createCount; i++) {

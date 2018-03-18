@@ -38,13 +38,31 @@ void PointChooser::chooseGoal_Forward(int prevPoint)
 
 }
 
-Vector3 PointChooser::operator()(bool& isEnd)
+int PointChooser::getCurrentPoint() const
+{
+	return currentPoint_;
+}
+
+Vector3 PointChooser::operator()(bool& isEnd, ChooseType type)
 {
 	int prevPoint = currentPoint_;
 	currentPoint_ = world_->getCityMap().getNextCarPoint(currentPoint_, goal_);
 	isEnd = (currentPoint_ == goal_||currentPoint_==-1);
+
+	if (currentPoint_ == -1)currentPoint_ = prevPoint;//‚»‚Ìê‚ÅÄŒvŽZ‚·‚éê‡‚Í1‚Â–ß‚é
+
 	if (isEnd) {
-		chooseGoal_Forward(prevPoint);
+		switch (type)
+		{
+		case ChooseType::NotBack:
+			chooseGoal_Forward(prevPoint);
+			break;
+		case ChooseType::CanBack:
+			chooseGoal();
+			break;
+		default:
+			break;
+		}
 	}
 	return world_->getCityMap().getPosition(currentPoint_);
 }

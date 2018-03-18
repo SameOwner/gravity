@@ -15,13 +15,18 @@ void ActorManager::initialize()
 	root_ = std::make_shared<Actor>();
 
 	actors_[ActorGroup::PLAYER_ACTOR] = std::make_shared<Actor>();
+	actors_[ActorGroup::ENEMY_ACTOR] = std::make_shared<Actor>();
 	actors_[ActorGroup::ETCETERA_ACTOR] = std::make_shared<Actor>();
 	actors_[ActorGroup::CAR_ACTOR] = std::make_shared<Actor>();
+	actors_[ActorGroup::CITIZEN_ACTOR] = std::make_shared<Actor>();
 	actors_[ActorGroup::POINT_ACTOR] = std::make_shared<Actor>();
+	
 	root_->clearChildren();
 	root_->addChild(actors_[ActorGroup::PLAYER_ACTOR]);
+	root_->addChild(actors_[ActorGroup::ENEMY_ACTOR]);
 	root_->addChild(actors_[ActorGroup::ETCETERA_ACTOR]);
 	root_->addChild(actors_[ActorGroup::CAR_ACTOR]);
+	root_->addChild(actors_[ActorGroup::CITIZEN_ACTOR]);
 	root_->addChild(actors_[ActorGroup::POINT_ACTOR]);
 
 }
@@ -60,9 +65,9 @@ ActorPtr ActorManager::findActor(const std::string & name)
 	return root_->findCildren(name);
 }
 
-void ActorManager::findActor(const std::string & name, std::list<std::weak_ptr<Actor>>& actorList)
+void ActorManager::findActor(ActorGroup group,const std::string & name, std::list<std::weak_ptr<Actor>>& actorList)
 {
-	root_->findCildren(name,actorList);
+	actors_[group]->findCildren(name,actorList);
 }
 
 void ActorManager::handleMessage(EventMessage message, void * param)
@@ -78,6 +83,9 @@ unsigned int ActorManager::getSize(ActorGroup group) const
 void ActorManager::collide()
 {
 	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::POINT_ACTOR]);
+	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::ENEMY_ACTOR]);
+	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::CITIZEN_ACTOR]);
 	actors_[ActorGroup::PLAYER_ACTOR]->collideChildren(*actors_[ActorGroup::CAR_ACTOR]);
+	
 
 }

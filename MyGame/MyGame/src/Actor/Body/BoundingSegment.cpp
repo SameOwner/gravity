@@ -89,20 +89,27 @@ Vector3 BoundingSegment::Direction() const{
 
 // ê}å`ï`âÊ
 void BoundingSegment::draw() const{
+#ifdef _DEBUG
+
 	Vector3 p[2];
 	p[0] = mPosition + Vector3::Up * mLength / 2 * mMatrix;
 	p[1] = mPosition + Vector3::Down * mLength / 2 * mMatrix;
 
 	DrawLine3D(Vector3::Vector3ToVECTOR(p[0]), Vector3::Vector3ToVECTOR(p[1]), GetColor(255, 255, 255));
+#endif // _DEBUG
 }
 
 void BoundingSegment::draw(const Vector3 & position) const
 {
+#ifdef _DEBUG
+
+
 	Vector3 p[2];
 	p[0] = mPosition + Vector3::Up * mLength / 2 * mMatrix +position;
 	p[1] = mPosition + Vector3::Down * mLength / 2 * mMatrix +position;
 
 	DrawLine3D(Vector3::Vector3ToVECTOR(p[0]), Vector3::Vector3ToVECTOR(p[1]), GetColor(255, 255, 255));
 
+#endif // _DEBUG
 }
 

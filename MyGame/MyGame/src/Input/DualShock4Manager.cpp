@@ -1,5 +1,6 @@
 #include "DualShock4Manager.h"
 #include<algorithm>
+#include<chrono>
 
 //DualShock4コントローラを認識する(成功したらtrueを返す)
 
@@ -104,6 +105,7 @@ void DualShock4Manager::Update() {
 	//1つ前のデータに書き込む
 	memcpy(previousData_, currentData_, dataSize_);
 	//読み込みを行う(読み込みデータはcurrentData_に格納される)
+	
 	if (ReadFile(handle_, currentData_, dataSize_, &readBytes, NULL) == TRUE) {
 		Update_Angle();
 		Update_Acceleration();

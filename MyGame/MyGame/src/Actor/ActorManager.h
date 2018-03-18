@@ -20,7 +20,7 @@ public:
 	// アクターの検索
 	ActorPtr findActor(const std::string& name);
 	// アクターの一括検索
-	void findActor(const std::string& name, std::list<std::weak_ptr<Actor>>& actorList);
+	void findActor(ActorGroup group,const std::string& name, std::list<std::weak_ptr<Actor>>& actorList);
 	// メッセージ処理
 	void handleMessage(EventMessage message, void* param);
 

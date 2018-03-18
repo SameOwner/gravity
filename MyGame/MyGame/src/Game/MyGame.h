@@ -6,7 +6,7 @@
 #include "../Input/InputChecker.h"
 #include "../Math/Math.h"
 #include"../Camera/Camera.h"
-#include"../Input/DualShock4Manager.h"
+#include"../Input/GamePad.h"
 #include"../Graphic/EffekseerManager.h"
 #include"../Scene/SceneManager.h"
 
@@ -31,8 +31,7 @@ public:
 		if (DxLib_Init() == -1)return -1;//エラーが起きたら終了
 		SetDrawScreen(DX_SCREEN_BACK);
 		SetUseBackCulling(TRUE);
-		EffekseerManager::GetInstance().Initialize();
-
+		SetAlwaysRunFlag(TRUE);//デバッグ用
 		start();
 
 		// キーが押されるまでループします
@@ -84,9 +83,8 @@ private:
 		Time::GetInstance().update();
 		//入力の更新
 		InputChecker::GetInstance().Update();
-		//DualShock4専用の入力更新
-		DualShock4Manager::GetInstance().Update();
-		EffekseerManager::GetInstance().Update();
+		//入力更新
+		GamePad::GetInstance().Update();
 
 	}
 	// コピー禁止

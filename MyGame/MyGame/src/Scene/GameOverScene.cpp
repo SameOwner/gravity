@@ -2,6 +2,7 @@
 #include"../Input/InputChecker.h"
 #include"../Graphic/DebugDraw.h"
 #include"../Define.h"
+#include"../Sound/Sound.h"
 
 GameOverScene::GameOverScene()
 {
@@ -22,6 +23,8 @@ void GameOverScene::update(float deltaTime)
 {
 	if (InputChecker::GetInstance().KeyTriggerDown(InputChecker::Input_Key::A)) {
 		isEnd_ = true;
+		Sound::GetInstance().PlaySE_IsNotPlay(SE_ID::SELECT_SE);
+
 	}
 
 }

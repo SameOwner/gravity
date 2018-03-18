@@ -14,7 +14,7 @@ public:
 	// 描画
 	void Draw(const Matrix& rotation) const;
 	// アニメーション切り替え
-	void ChangeAnim(const int motion, const float frame = 0.0f, float animSpeed = 1.0f, bool isLoop = true);
+	void ChangeAnim(const int motion, const float frame = 0.0f, float animSpeed = 1.0f, bool isLoop = true, float blend = 1.0f, bool forceChange = false);
 	// モデルハンドル登録(受け取ったハンドルを基にモデルをコピーするため、受取時のハンドルをそのまま使う事は出来ない)
 	void SetHandle(const int& handle);
 	// アニメーションエンドフラグ
@@ -31,9 +31,11 @@ public:
 	void setLoop(bool isLoop) { isLoop_ = isLoop; }
 	//アニメーションの再生速度を設定する
 	void setAnimSpeed(float animSpeed) { animSpeed_ = animSpeed; }
-	//アニメーションを強制的にブレンドする
-	void blendAnim(int anim1, int anim2, float blendRate);
+	//モデルハンドルの取得
+	int getModelHandle() const;
+	void lastAnim();
 private:
+	void clearModel();
 	// コピーコンストラクタ
 	AnimationDx(const AnimationDx& other) = delete;
 	// 代入演算子
@@ -43,7 +45,7 @@ private:
 	// ブレンドレートタイム
 	const float RATE_TIME = 0.1f;
 	// モデルハンドル
-	int		modelHandle_;
+	int		modelHandle_{ -1 };
 	// 今モーション
 	int		motion_;
 	// 前モーション
@@ -64,6 +66,8 @@ private:
 	int		prevAnim_;
 	//ループするか
 	bool isLoop_{ true };
+	//前のアニメーションがループしていたか
+	bool prevLoop_{ true };
 	//アニメーションの再生速度
 	float animSpeed_{ 1.0f };
 };

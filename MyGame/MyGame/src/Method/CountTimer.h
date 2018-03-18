@@ -11,9 +11,18 @@ public:
 	void set(int count) {
 		count_ = count;
 	}
+	//時間を設定
+	void setTime(float time) {
+		count_ = (int)(time*60.0f);
+	}
+	//タイマーが終わったか
+	bool isTime()const {
+		return count_ <= 0;
+	}
+	//カウントダウン(結果も一緒に返却)
 	bool operator ()() {
 		count_--;
-		return count_ <= 0;
+		return isTime();
 	}
 private:
 	int count_{ 0 };//実行回数

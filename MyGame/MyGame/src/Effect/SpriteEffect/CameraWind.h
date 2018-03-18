@@ -19,5 +19,5 @@ private:
 	//風エフェクトの数
 	int WindSize{ 40 };
 	//風群の管理(ポジション,割合,角度,速度)
-	std::list<std::tuple<Vector2, float,int,float>> windPoints_;
+	std::list<std::tuple<Vector2, float,float,float>> windPoints_;
 };

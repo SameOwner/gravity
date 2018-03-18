@@ -6,7 +6,7 @@
 
 // コンストラクタ
 FieldBase::FieldBase(int field, int skybox) :
-	field_(field), skyBox_(skybox), mesh_(field_) {
+	field_(field), skyBox_(skybox), mesh_(field_), out_(skybox){
 	//モデルが設定されていなかったら返す
 	if (field_ < 0 || skyBox_<0)return;
 
@@ -44,4 +44,9 @@ int FieldBase::modelHandle() {
 CollisionMesh& FieldBase::getMesh()
 {
 	return mesh_;
+}
+
+CollisionMesh & FieldBase::getOutMesh()
+{
+	return out_.mesh_;
 }
